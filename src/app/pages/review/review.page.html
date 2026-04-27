@@ -1,0 +1,46 @@
+<ion-header>
+  <ion-toolbar color="success">
+    <ion-title>Review Caption</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <h3>Original Caption</h3>
+
+  <ion-card>
+    <ion-card-content>
+      {{ post.content }}
+    </ion-card-content>
+  </ion-card>
+
+  <h3>Decision</h3>
+
+  <ion-radio-group [(ngModel)]="decision">
+
+    <ion-item>
+      <ion-label>Approve</ion-label>
+      <ion-radio value="approve"></ion-radio>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Request Revision</ion-label>
+      <ion-radio value="reject"></ion-radio>
+    </ion-item>
+
+  </ion-radio-group>
+
+  <ion-textarea
+    *ngIf="decision === 'reject'"
+    [(ngModel)]="feedback"
+    placeholder="Write feedback..."
+  ></ion-textarea>
+
+  <ion-button expand="block" color="success" (click)="submit()">
+    Submit
+  </ion-button>
+
+</ion-content>

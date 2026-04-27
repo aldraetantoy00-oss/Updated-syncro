@@ -1,0 +1,7 @@
+{
+  "name": "syncro",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

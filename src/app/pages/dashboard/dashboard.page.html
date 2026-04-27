@@ -1,0 +1,123 @@
+<ion-content [fullscreen]="true">
+
+  <div class="page">
+
+    <!-- HEADER -->
+    <div class="header">
+      <div class="top">
+        <ion-icon name="menu-outline"></ion-icon>
+        <span>Syncro</span>
+        <ion-icon name="notifications-outline"></ion-icon>
+      </div>
+
+      <h2>Welcome back,</h2>
+      <h1>sampleorg 👋</h1>
+      <p>Here’s what’s happening today.</p>
+    </div>
+
+    <!-- SEARCH -->
+    <ion-item lines="none" class="search">
+      <ion-icon name="search-outline" slot="start"></ion-icon>
+      <ion-input placeholder="Search submissions..."></ion-input>
+      <ion-icon name="options-outline" slot="end"></ion-icon>
+    </ion-item>
+
+    <!-- OVERVIEW -->
+    <div class="section-header">
+      <span>Overview</span>
+      <span class="view">View All</span>
+    </div>
+
+    <div class="stats">
+
+      <div class="stat-card">
+        <ion-icon name="document-outline" class="green"></ion-icon>
+        <h2>{{ stats.total }}</h2>
+        <p>Total</p>
+      </div>
+
+      <div class="stat-card">
+        <ion-icon name="hourglass-outline" class="yellow"></ion-icon>
+        <h2>{{ stats.pending }}</h2>
+        <p>Awaiting</p>
+      </div>
+
+      <div class="stat-card">
+        <ion-icon name="time-outline" class="blue"></ion-icon>
+        <h2>{{ stats.in_review }}</h2>
+        <p>With PAIR</p>
+      </div>
+
+      <div class="stat-card">
+        <ion-icon name="checkmark-circle-outline" class="green"></ion-icon>
+        <h2>{{ stats.approved }}</h2>
+        <p>Approved</p>
+      </div>
+
+    </div>
+
+    <!-- AWAITING -->
+    <div class="section-header">
+      <span>Awaiting Your Approval</span>
+      <ion-badge color="warning">{{ awaiting.length }}</ion-badge>
+    </div>
+
+    <div *ngFor="let post of awaiting" class="awaiting-card">
+
+      <ion-icon name="hourglass-outline" class="yellow"></ion-icon>
+
+      <div class="content">
+        <strong>{{ post.content }}</strong>
+        <p>{{ post.createdAt?.toDate() | date }}</p>
+      </div>
+
+      <ion-button size="small" color="warning" (click)="openReview(post)">
+        Review
+      </ion-button>
+
+    </div>
+
+    <!-- RECENT -->
+    <div class="section-header">
+      <span>Recent Submissions</span>
+      <span class="view">View All</span>
+    </div>
+
+    <div *ngFor="let post of posts" class="recent-card">
+
+      <div class="dot"></div>
+
+      <div class="content">
+        <strong>{{ post.content }}</strong>
+
+        <div class="meta">
+
+          <ion-badge color="warning" *ngIf="post.status==='pending'">Pending</ion-badge>
+          <ion-badge color="primary" *ngIf="post.status==='in_review'">Reviewing</ion-badge>
+          <ion-badge color="success" *ngIf="post.status==='completed'">Approved</ion-badge>
+
+          <span>{{ post.createdAt?.toDate() | date }}</span>
+        </div>
+
+        <p *ngIf="post.feedback" class="feedback">
+          Feedback: {{ post.feedback }}
+        </p>
+
+      </div>
+
+      <div class="eye-btn" (click)="openReview(post)">
+        <ion-icon name="eye-outline"></ion-icon>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- FAB -->
+  <ion-fab vertical="bottom" horizontal="end">
+    <ion-fab-button color="success" routerLink="/submit">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+</ion-content>
