@@ -28,6 +28,7 @@
     "@capacitor/keyboard": "8.0.3",
     "@capacitor/status-bar": "8.0.2",
     "@ionic/angular": "^8.0.0",
+    "@supabase/supabase-js": "^2.106.0",
     "firebase": "^11.10.0",
     "ionicons": "^7.0.0",
     "openai": "^6.34.0",

@@ -1,0 +1,89 @@
+<ion-content class="signup-page">
+
+  <div class="container">
+
+    <!-- LOGO -->
+    <div class="logo-section">
+
+      <h1>Syncro</h1>
+
+      <p>Create your account</p>
+
+    </div>
+
+    <!-- USERNAME -->
+    <div class="input-group">
+
+      <label>Username</label>
+
+      <ion-input
+        [(ngModel)]="username"
+        placeholder="Choose a username"
+      ></ion-input>
+
+    </div>
+
+    <!-- EMAIL -->
+    <div class="input-group">
+
+      <label>Email</label>
+
+      <ion-input
+        [(ngModel)]="email"
+        type="email"
+        placeholder="you@example.com"
+      ></ion-input>
+
+    </div>
+
+    <!-- PASSWORD -->
+    <div class="input-group">
+
+      <label>Password</label>
+
+      <ion-input
+        [(ngModel)]="password"
+        type="password"
+        placeholder="Enter password"
+      ></ion-input>
+
+    </div>
+
+    <!-- CONFIRM -->
+    <div class="input-group">
+
+      <label>Confirm Password</label>
+
+      <ion-input
+        [(ngModel)]="confirmPassword"
+        type="password"
+        placeholder="Confirm password"
+      ></ion-input>
+
+    </div>
+
+    <!-- BUTTON -->
+    <ion-button
+      expand="block"
+      class="signup-btn"
+      (click)="register()"
+    >
+
+      Create Account
+
+    </ion-button>
+
+    <!-- LOGIN -->
+    <div class="login-link">
+
+      Already registered?
+
+      <span routerLink="/login">
+        Sign in
+      </span>
+
+    </div>
+
+  </div>
+
+</ion-content>

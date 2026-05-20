@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { AuthService } from '../../services/auth';
-import { NavController } from '@ionic/angular';
+import { Router } from '@angular/router';
+import { LoadingController } from '@ionic/angular';
+import { SupabaseService } from '../../services/supabase';
 
 @Component({
   selector: 'app-login',
@@ -14,35 +15,63 @@ export class LoginPage {
   password = '';
 
   constructor(
-    private auth: AuthService,
-    private navCtrl: NavController
+    private router: Router,
+    private loadingCtrl: LoadingController,
+    private supabaseService: SupabaseService
   ) {}
 
-  login() {
+  // LOGIN
+  async login() {
 
-    this.auth.login(this.email, this.password)
-      .then(() => {
+    // VALIDATION
+    if (!this.email || !this.password) {
 
-        this.navCtrl.navigateRoot('/tabs/dashboard');
+      alert('Please enter email and password');
 
-      })
-      .catch(err => {
+      return;
+    }
 
-        alert(err.message);
+    // LOADING
+    const loading = await this.loadingCtrl.create({
+      message: 'Signing in...'
+    });
 
-      });
+    await loading.present();
 
+    try {
+
+      // SUPABASE LOGIN
+      const { data, error } =
+        await this.supabaseService.supabase.auth.signInWithPassword({
+
+          email: this.email,
+
+          password: this.password
+
+        });
+
+      loading.dismiss();
+
+      console .log('SUPABASE LOGIN DATA:', data);
+      console.log('SUPABASE LOGIN ERROR:', error);
+
+      if (error) {
+
+        alert(error.message);
+
+      } else {
+
+      this.router.navigateByUrl('/tabs/dashboard');
+      }
+
+    } catch (err) {
+
+      loading.dismiss();
+
+      console.error('LOGIN ERROR:', err);
+
+      alert('An error occurred during login. Please try again.');
+
+    }
   }
-
-  signup() {
-
-    this.auth.signup(this.email, this.password)
-      .then(() => {
-
-        alert('Account created');
-
-      });
-
-  }
-
 }

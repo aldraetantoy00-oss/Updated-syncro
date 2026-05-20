@@ -21,6 +21,14 @@ const routes: Routes = [
   {
     path: 'enhance',
     loadChildren: () => import('./pages/enhance/enhance.module').then( m => m.EnhancePageModule)
+  },
+  {
+    path: 'all-submissions',
+    loadChildren: () => import('./pages/all-submissions/all-submissions.module').then( m => m.AllSubmissionsPageModule)
+  },
+  {
+    path: 'signup',
+    loadChildren: () => import('./pages/signup/signup.module').then( m => m.SignupPageModule)
   }
 
 ];

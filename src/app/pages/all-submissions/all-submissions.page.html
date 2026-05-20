@@ -1,0 +1,105 @@
+<ion-content [fullscreen]="true">
+
+  <div class="page">
+
+    <!-- HEADER -->
+    <div class="header">
+
+      <div class="top">
+
+        <ion-button
+          fill="clear"
+          color="light"
+          routerLink="/tabs/dashboard"
+        >
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </ion-button>
+
+        <h1>All Submissions</h1>
+
+      </div>
+
+      <p>
+        View all submitted content and statuses
+      </p>
+
+    </div>
+
+    <!-- POSTS -->
+    <div
+      *ngFor="let post of posts"
+      class="recent-card"
+    >
+
+      <!-- STATUS LINE -->
+      <div
+        class="status-line"
+        [ngClass]="{
+          'pending-line': post.status === 'pending',
+          'review-line': post.status === 'in_review',
+          'approved-line': post.status === 'completed'
+        }"
+      ></div>
+
+      <!-- CONTENT -->
+      <div class="content">
+
+        <strong class="caption">
+
+          {{
+            post.original_caption ||
+            post.enhanced_caption ||
+            'No caption'
+          }}
+
+        </strong>
+
+        <!-- META -->
+        <div class="meta">
+
+          <ion-badge
+            color="warning"
+            *ngIf="post.status === 'pending'"
+          >
+            Pending
+          </ion-badge>
+
+          <ion-badge
+            color="primary"
+            *ngIf="post.status === 'in_review'"
+          >
+            Reviewing
+          </ion-badge>
+
+          <ion-badge
+            color="success"
+            *ngIf="post.status === 'completed'"
+          >
+            Approved
+          </ion-badge>
+
+          <span class="date">
+
+            {{ post.created_at | date:'MMM d, y • h:mm a' }}
+
+          </span>
+
+        </div>
+
+      </div>
+
+      <!-- EYE BUTTON -->
+      <div
+        class="eye-btn"
+        (click)="openEnhance(post)"
+      >
+
+        <ion-icon name="eye-outline"></ion-icon>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</ion-content>

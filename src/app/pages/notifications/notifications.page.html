@@ -1,7 +1,84 @@
-<ion-content class="ion-padding">
+<ion-content>
 
-  <h2>Notifications</h2>
+  <div class="page">
 
-  <p>No notifications yet.</p>
+    <!-- HEADER -->
+<div class="header">
 
-</ion-content>
+  <div class="top-bar">
+
+    <ion-icon name="menu-outline"></ion-icon>
+
+    <span>Syncro</span>
+
+    <ion-icon name="notifications-outline"></ion-icon>
+
+  </div>
+
+</div>
+
+    <!-- EMPTY -->
+    <div
+      *ngIf="notifications.length === 0"
+      class="empty"
+    >
+
+      <ion-icon
+        name="notifications-off-outline"
+      ></ion-icon>
+
+      <h2>No notifications yet</h2>
+
+    </div>
+
+    <!-- NOTIFICATIONS -->
+<div
+  *ngFor="let item of notifications"
+  class="notif-card"
+>
+
+  <!-- ICON -->
+  <div class="notif-icon">
+
+    <ion-icon
+      name="notifications-outline"
+    ></ion-icon>
+
+  </div>
+
+  <!-- CONTENT -->
+  <div class="notif-content">
+
+    <!-- TITLE -->
+    <h3>
+
+      {{
+        item.parsedData.title ||
+        'Notification'
+      }}
+
+    </h3>
+
+    <!-- MESSAGE -->
+    <p>
+
+      {{
+        item.parsedData.message ||
+        'New activity detected.'
+      }}
+
+    </p>
+
+    <!-- DATE -->
+    <span>
+
+      {{
+        item.created_at
+          | date:'MMM d, y • h:mm a'
+      }}
+
+    </span>
+
+  </div>
+
+</div>

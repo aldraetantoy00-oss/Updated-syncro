@@ -1,0 +1,160 @@
+ion-content {
+  --background: #f5f7fb;
+}
+
+/* PAGE */
+.page {
+  min-height: 100vh;
+}
+
+/* HEADER */
+.header {
+  background:
+    linear-gradient(
+      135deg,
+      #166534,
+      #22c55e
+    );
+
+  color: white;
+
+  padding: 24px;
+
+  border-radius: 0 0 28px 28px;
+
+  box-shadow:
+    0 8px 24px rgba(34,197,94,0.2);
+
+  margin-bottom: 20px;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header h1 {
+  font-size: 28px;
+  font-weight: 800;
+
+  margin: 0;
+}
+
+.header p {
+  opacity: 0.85;
+
+  margin-top: 10px;
+}
+
+/* RECENT CARD */
+.recent-card {
+  display: flex;
+  align-items: flex-start;
+
+  margin: 14px 15px;
+
+  padding: 16px;
+
+  border-radius: 20px;
+
+  background: white;
+
+  box-shadow:
+    0 6px 20px rgba(0,0,0,0.05);
+
+  transition: 0.2s ease;
+}
+
+.recent-card:active {
+  transform: scale(0.98);
+}
+
+/* STATUS LINE */
+.status-line {
+  width: 4px;
+  border-radius: 999px;
+
+  margin-right: 14px;
+}
+
+.pending-line {
+  background: #facc15;
+}
+
+.review-line {
+  background: #3b82f6;
+}
+
+.approved-line {
+  background: #22c55e;
+}
+
+/* CONTENT */
+.content {
+  flex: 1;
+}
+
+.caption {
+  font-size: 16px;
+  line-height: 1.6;
+
+  display: block;
+
+  margin-bottom: 12px;
+}
+
+/* META */
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin-bottom: 12px;
+}
+
+.meta span {
+  color: #666;
+  font-size: 12px;
+}
+
+/* BADGES */
+ion-badge {
+  border-radius: 999px;
+
+  padding: 5px 10px;
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* EYE BUTTON */
+.eye-btn {
+  margin-left: 12px;
+
+  width: 44px;
+  height: 44px;
+
+  border-radius: 14px;
+
+  background: rgba(34,197,94,0.08);
+
+  border: 2px solid #16a34a;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #16a34a;
+
+  font-size: 20px;
+}
+.date {
+  margin-top: 8px;
+
+  font-size: 13px;
+
+  color: #6b7280;
+
+  font-weight: 500;
+}

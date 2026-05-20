@@ -7,28 +7,45 @@
 
       <div class="form-wrapper">
 
-        <h1 class="logo">⟳ Syncro</h1>
+        <!-- LOGO -->
+        <h1 class="logo">
+          ⟳ Syncro
+        </h1>
 
         <!-- EMAIL -->
-        <ion-item lines="none" class="input-item">
-          <ion-icon name="person-outline" slot="start"></ion-icon>
+        <ion-item
+          lines="none"
+          class="input-item"
+        >
+
+          <ion-icon
+            name="person-outline"
+            slot="start"
+          ></ion-icon>
 
           <ion-input
             [(ngModel)]="email"
-            placeholder="Username">
-          </ion-input>
+            placeholder="Username"
+          ></ion-input>
 
         </ion-item>
 
         <!-- PASSWORD -->
-        <ion-item lines="none" class="input-item">
-          <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+        <ion-item
+          lines="none"
+          class="input-item"
+        >
+
+          <ion-icon
+            name="lock-closed-outline"
+            slot="start"
+          ></ion-icon>
 
           <ion-input
             [(ngModel)]="password"
             type="password"
-            placeholder="Password">
-          </ion-input>
+            placeholder="Password"
+          ></ion-input>
 
         </ion-item>
 
@@ -36,23 +53,33 @@
         <ion-button
           expand="block"
           class="login-btn"
-          (click)="login()">
+          (click)="login()"
+        >
 
-          Sign In
-
-        </ion-button>
-
-        <p class="forgot">New to Syncro?</p>
-
-        <!-- SIGNUP BUTTON -->
-        <ion-button
-          fill="clear"
-          class="signup-btn"
-          (click)="signup()">
-
-          Create an account
+          SIGN IN
 
         </ion-button>
+
+        <!-- NEW USER -->
+        <p class="forgot">
+
+          New to Syncro?
+
+        </p>
+
+        <!-- CREATE ACCOUNT -->
+        <div class="create-account-container">
+
+          <span
+            class="create-account-link"
+            routerLink="/signup"
+          >
+
+            CREATE AN ACCOUNT
+
+          </span>
+
+        </div>
 
       </div>
 

@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { PostService } from '../../services/post';
 import { ModalController } from '@ionic/angular';
+
 import { ReviewPage } from '../review/review.page';
-import { EnhancePage } from '../enhance/enhance.page'; // ✅ ADD THIS
+import { EnhancePage } from '../enhance/enhance.page';
+
+import { SupabaseService } from '../../services/supabase';
 
 @Component({
   selector: 'app-dashboard',
@@ -13,53 +15,132 @@ import { EnhancePage } from '../enhance/enhance.page'; // ✅ ADD THIS
 export class DashboardPage implements OnInit {
 
   posts: any[] = [];
-  awaiting: any[] = [];
 
-  stats = {
-    total: 0,
-    pending: 0,
-    in_review: 0,
-    approved: 0
-  };
+  // STATS
+  totalSubmissions = 0;
+
+  awaitingReview = 0;
+
+  withPair = 0;
+
+  approved = 0;
 
   constructor(
-    private postService: PostService,
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private supabaseService: SupabaseService
   ) {}
 
   ngOnInit() {
-    this.postService.getPosts().subscribe((data: any[]) => {
 
-      this.posts = data;
+    this.getPosts();
 
-      this.stats.total = data.length;
-      this.stats.pending = data.filter(p => p.status === 'pending').length;
-      this.stats.in_review = data.filter(p => p.status === 'in_review').length;
-      this.stats.approved = data.filter(p => p.status === 'completed').length;
-
-      this.awaiting = data.filter(p => p.status === 'pending');
-    });
   }
 
-  // ✅ REVIEW (separate button)
+  // GET POSTS
+  async getPosts() {
+
+    const { data, error } =
+      await this.supabaseService.supabase
+        .from('submissions')
+        .select('*')
+        .order('created_at', {
+          ascending: false
+        });
+
+    console.log(
+      'SUPABASE DATA:',
+      data
+    );
+
+    console.log(
+      'SUPABASE ERROR:',
+      error
+    );
+
+    if (data) {
+
+      // FORMAT DATES
+      this.posts = data.map(post => ({
+
+        ...post,
+
+        created_at:
+          post.created_at
+            ? new Date(post.created_at)
+            : null
+
+      }));
+
+      // COUNTS
+      this.totalSubmissions =
+        this.posts.length;
+
+      this.awaitingReview =
+        this.posts.filter(
+
+          p => p.status === 'pending'
+
+        ).length;
+
+      this.withPair =
+        this.posts.filter(
+
+          p =>
+            p.workflow_status ===
+            'submitted'
+
+        ).length;
+
+      this.approved =
+        this.posts.filter(
+
+          p => p.status === 'approved'
+
+        ).length;
+
+    }
+  }
+
+  // REVIEW
   async openReview(post: any) {
-    const modal = await this.modalCtrl.create({
-      component: ReviewPage,
-      componentProps: { post },
-      breakpoints: [0, 0.5, 1],
-      initialBreakpoint: 0.5
-    });
+
+    const modal =
+      await this.modalCtrl.create({
+
+        component: ReviewPage,
+
+        componentProps: { post }
+
+      });
 
     await modal.present();
+
+    modal.onDidDismiss().then(() => {
+
+      this.getPosts();
+
+    });
   }
 
-  // ✅ ENHANCE (EYE BUTTON)
+  // ENHANCE
   async openEnhance(post: any) {
-    const modal = await this.modalCtrl.create({
-      component: EnhancePage,
-      componentProps: { post }
-    });
+
+    const modal =
+      await this.modalCtrl.create({
+
+        component: EnhancePage,
+
+        componentProps: { post }
+
+      });
 
     await modal.present();
+
+    // REFRESH AFTER CLOSE
+    modal.onDidDismiss().then(() => {
+
+      this.getPosts();
+
+    });
   }
 }

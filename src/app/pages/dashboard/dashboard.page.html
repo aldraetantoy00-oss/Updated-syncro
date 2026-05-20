@@ -4,120 +4,216 @@
 
     <!-- HEADER -->
     <div class="header">
+
       <div class="top">
+
         <ion-icon name="menu-outline"></ion-icon>
+
         <span>Syncro</span>
+
         <ion-icon name="notifications-outline"></ion-icon>
+
       </div>
 
       <h2>Welcome back,</h2>
-      <h1>sampleorg 👋</h1>
+
+      <h1>AdminOrg 👋</h1>
+
       <p>Here’s what’s happening today.</p>
+
     </div>
+    <!-- STATS -->
+<div class="stats-grid">
 
-    <!-- SEARCH -->
-    <ion-item lines="none" class="search">
-      <ion-icon name="search-outline" slot="start"></ion-icon>
-      <ion-input placeholder="Search submissions..."></ion-input>
-      <ion-icon name="options-outline" slot="end"></ion-icon>
-    </ion-item>
+  <!-- TOTAL -->
+  <div class="stat-card">
 
-    <!-- OVERVIEW -->
-    <div class="section-header">
-      <span>Overview</span>
-      <span class="view">View All</span>
-    </div>
+    <div class="stat-top">
 
-    <div class="stats">
+      <span>Total Submissions</span>
 
-      <div class="stat-card">
-        <ion-icon name="document-outline" class="green"></ion-icon>
-        <h2>{{ stats.total }}</h2>
-        <p>Total</p>
-      </div>
-
-      <div class="stat-card">
-        <ion-icon name="hourglass-outline" class="yellow"></ion-icon>
-        <h2>{{ stats.pending }}</h2>
-        <p>Awaiting</p>
-      </div>
-
-      <div class="stat-card">
-        <ion-icon name="time-outline" class="blue"></ion-icon>
-        <h2>{{ stats.in_review }}</h2>
-        <p>With PAIR</p>
-      </div>
-
-      <div class="stat-card">
-        <ion-icon name="checkmark-circle-outline" class="green"></ion-icon>
-        <h2>{{ stats.approved }}</h2>
-        <p>Approved</p>
-      </div>
+      <ion-icon
+        name="document-outline"
+        class="blue"
+      ></ion-icon>
 
     </div>
 
-    <!-- AWAITING -->
-    <div class="section-header">
-      <span>Awaiting Your Approval</span>
-      <ion-badge color="warning">{{ awaiting.length }}</ion-badge>
-    </div>
+    <h1>{{ totalSubmissions }}</h1>
 
-    <div *ngFor="let post of awaiting" class="awaiting-card">
+  </div>
 
-      <ion-icon name="hourglass-outline" class="yellow"></ion-icon>
+  <!-- PENDING -->
+  <div class="stat-card">
 
-      <div class="content">
-        <strong>{{ post.content }}</strong>
-        <p>{{ post.createdAt?.toDate() | date }}</p>
-      </div>
+    <div class="stat-top">
 
-      <ion-button size="small" color="warning" (click)="openReview(post)">
-        Review
-      </ion-button>
+      <span>Awaiting Your Review</span>
+
+      <ion-icon
+        name="hourglass-outline"
+        class="yellow"
+      ></ion-icon>
 
     </div>
 
-    <!-- RECENT -->
-    <div class="section-header">
-      <span>Recent Submissions</span>
-      <span class="view">View All</span>
+    <h1>{{ awaitingReview }}</h1>
+
+  </div>
+
+  <!-- PAIR -->
+  <div class="stat-card">
+
+    <div class="stat-top">
+
+      <span>With PAIR</span>
+
+      <ion-icon
+        name="time-outline"
+        class="gray"
+      ></ion-icon>
+
     </div>
 
-    <div *ngFor="let post of posts" class="recent-card">
+    <h1>{{ withPair }}</h1>
 
-      <div class="dot"></div>
+  </div>
 
-      <div class="content">
-        <strong>{{ post.content }}</strong>
+  <!-- APPROVED -->
+  <div class="stat-card">
 
-        <div class="meta">
+    <div class="stat-top">
 
-          <ion-badge color="warning" *ngIf="post.status==='pending'">Pending</ion-badge>
-          <ion-badge color="primary" *ngIf="post.status==='in_review'">Reviewing</ion-badge>
-          <ion-badge color="success" *ngIf="post.status==='completed'">Approved</ion-badge>
+      <span>Approved</span>
 
-          <span>{{ post.createdAt?.toDate() | date }}</span>
-        </div>
+      <ion-icon
+        name="checkmark-circle"
+        class="green"
+      ></ion-icon>
 
-        <p *ngIf="post.feedback" class="feedback">
-          Feedback: {{ post.feedback }}
-        </p>
+    </div>
 
-      </div>
+    <h1>{{ approved }}</h1>
 
-      <div class="eye-btn" (click)="openEnhance(post)">
-  <ion-icon name="eye-outline"></ion-icon>
+  </div>
+
 </div>
+
+    <!-- SECTION HEADER -->
+    <div class="section-row">
+
+      <span class="section-title">
+        Recent Submissions
+      </span>
+
+      <!-- SEE ALL BUTTON -->
+      <div
+        class="see-all-btn"
+        routerLink="/all-submissions"
+      >
+
+        <span>See All</span>
+
+        <ion-icon name="arrow-forward-outline"></ion-icon>
+
+      </div>
+
+    </div>
+
+<!-- POSTS -->
+<div
+  *ngFor="let post of posts.slice(0,3)"
+  class="recent-card"
+>
+
+  <!-- STATUS LINE -->
+  <div
+    class="status-line"
+    [ngClass]="{
+      'pending-line': post.status === 'pending',
+      'review-line': post.status === 'in_review',
+      'approved-line': post.status === 'approved'
+    }"
+  ></div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- CAPTION -->
+    <strong class="caption">
+
+      {{
+        post.original_caption ||
+        post.enhanced_caption ||
+        'No caption'
+      }}
+
+    </strong>
+
+    <!-- META -->
+    <div class="meta">
+
+      <!-- PENDING -->
+      <ion-badge
+        color="warning"
+        *ngIf="post.status === 'pending'"
+      >
+        Pending
+      </ion-badge>
+
+      <!-- REVIEW -->
+      <ion-badge
+        color="primary"
+        *ngIf="post.status === 'in_review'"
+      >
+        Reviewing
+      </ion-badge>
+
+      <!-- APPROVED -->
+      <ion-badge
+        color="success"
+        *ngIf="post.status === 'approved'"
+      >
+        Approved
+      </ion-badge>
+
+      <!-- DATE -->
+      <span class="date">
+
+        {{
+          post.created_at
+            ? (post.created_at
+                | date:'MMM d, y • h:mm a')
+            : 'No date'
+        }}
+
+      </span>
+
+    </div>
+
+    <!-- WORKFLOW -->
+    <div class="workflow-chip">
+
+      <ion-icon
+        name="checkmark-circle-outline"
+      ></ion-icon>
+
+      Submitted Successfully
 
     </div>
 
   </div>
 
-  <!-- FAB -->
-  <ion-fab vertical="bottom" horizontal="end">
-    <ion-fab-button color="success" routerLink="/submit">
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
+  <!-- EYE BUTTON -->
+  <div
+    class="eye-btn"
+    (click)="openEnhance(post)"
+  >
 
-</ion-content>
+    <ion-icon
+      name="eye-outline"
+    ></ion-icon>
+
+  </div>
+
+</div>

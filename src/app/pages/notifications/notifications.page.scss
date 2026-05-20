@@ -1,0 +1,165 @@
+ion-content {
+  --background: #f5f7fb;
+}
+
+/* HEADER */
+.header {
+  background:
+    linear-gradient(
+      135deg,
+      #166534,
+      #15803d
+    );
+
+  padding: 14px 16px;
+
+  color: white;
+}
+
+/* TOP BAR */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-weight: 700;
+
+  font-size: 18px;
+}
+
+/* ICONS */
+.top-bar ion-icon {
+  font-size: 20px;
+}
+
+/* TITLE */
+.header h1 {
+  margin: 0;
+
+  font-size: 30px;
+  font-weight: 800;
+}
+
+/* SUBTITLE */
+.header p {
+  margin-top: 8px;
+
+  font-size: 14px;
+
+  opacity: 0.85;
+}
+
+/* CONTAINER */
+.container {
+  padding: 16px;
+}
+
+/* NOTIFICATION CARD */
+.notif-card {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 14px;
+
+  background: #ffffff;
+
+  border-radius: 16px;
+
+  padding: 16px;
+
+  margin-bottom: 14px;
+
+  box-shadow:
+    0 2px 6px rgba(0,0,0,0.05);
+
+  transition: 0.2s ease;
+}
+
+.notif-card:active {
+  transform: scale(0.98);
+}
+
+/* ICON */
+.notif-icon {
+  width: 50px;
+  height: 50px;
+
+  border-radius: 14px;
+
+  background:
+    rgba(21,128,61,0.12);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #15803d;
+
+  font-size: 22px;
+
+  flex-shrink: 0;
+}
+
+/* CONTENT */
+.notif-content {
+  flex: 1;
+}
+
+/* TITLE */
+.notif-content h3 {
+  margin: 0 0 6px;
+
+  font-size: 16px;
+  font-weight: 700;
+
+  color: #111827;
+}
+
+/* MESSAGE */
+.notif-content p {
+  margin: 0 0 10px;
+
+  color: #6b7280;
+
+  font-size: 14px;
+
+  line-height: 1.5;
+}
+
+/* DATE */
+.notif-content span {
+  font-size: 12px;
+
+  color: #9ca3af;
+
+  font-weight: 500;
+}
+
+/* EMPTY STATE */
+.empty {
+  text-align: center;
+
+  margin-top: 120px;
+
+  color: #9ca3af;
+}
+
+.empty ion-icon {
+  font-size: 70px;
+
+  color: #d1d5db;
+
+  margin-bottom: 14px;
+}
+
+.empty h2 {
+  font-size: 22px;
+
+  margin-bottom: 10px;
+
+  color: #374151;
+}
+
+.empty p {
+  font-size: 14px;
+}
