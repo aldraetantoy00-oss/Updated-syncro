@@ -1,7 +1,66 @@
-<ion-content class="ion-padding">
-  <ion-input [(ngModel)]="email" placeholder="Email"></ion-input>
-  <ion-input [(ngModel)]="password" type="password" placeholder="Password"></ion-input>
+<ion-content fullscreen>
 
-  <ion-button expand="full" (click)="login()">Login</ion-button>
-  <ion-button expand="full" (click)="signup()">Sign Up</ion-button>
+  <div class="login-container">
+
+    <!-- LEFT SIDE -->
+    <div class="login-form">
+
+      <div class="form-wrapper">
+
+        <h1 class="logo">⟳ Syncro</h1>
+
+        <!-- EMAIL -->
+        <ion-item lines="none" class="input-item">
+          <ion-icon name="person-outline" slot="start"></ion-icon>
+
+          <ion-input
+            [(ngModel)]="email"
+            placeholder="Username">
+          </ion-input>
+
+        </ion-item>
+
+        <!-- PASSWORD -->
+        <ion-item lines="none" class="input-item">
+          <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+
+          <ion-input
+            [(ngModel)]="password"
+            type="password"
+            placeholder="Password">
+          </ion-input>
+
+        </ion-item>
+
+        <!-- LOGIN BUTTON -->
+        <ion-button
+          expand="block"
+          class="login-btn"
+          (click)="login()">
+
+          Sign In
+
+        </ion-button>
+
+        <p class="forgot">New to Syncro?</p>
+
+        <!-- SIGNUP BUTTON -->
+        <ion-button
+          fill="clear"
+          class="signup-btn"
+          (click)="signup()">
+
+          Create an account
+
+        </ion-button>
+
+      </div>
+
+    </div>
+
+    <!-- RIGHT SIDE IMAGE -->
+    <div class="image-side"></div>
+
+  </div>
+
 </ion-content>

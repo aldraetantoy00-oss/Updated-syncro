@@ -1,0 +1,86 @@
+<ion-content class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div>
+      <h2>Enhance Caption</h2>
+      <p>Choose AI-assisted or manual enhancement</p>
+    </div>
+    <ion-icon name="close-outline" (click)="close()"></ion-icon>
+  </div>
+
+  <div class="container">
+
+    <!-- ORIGINAL -->
+    <div class="card">
+      <label>Original Caption</label>
+      <ion-textarea [value]="post.content" readonly></ion-textarea>
+    </div>
+
+    <!-- AI PROVIDER -->
+    <div class="card">
+      <label>AI Provider</label>
+
+      <div class="chips">
+        <button [class.active]="selectedProvider==='openai'" (click)="selectedProvider='openai'">
+          OpenAI
+        </button>
+
+        <button [class.active]="selectedProvider==='gemini'" (click)="selectedProvider='gemini'">
+          Gemini
+        </button>
+
+        <button [class.active]="selectedProvider==='deepseek'" (click)="selectedProvider='deepseek'">
+          Deepseek
+        </button>
+      </div>
+    </div>
+
+    <!-- TONE -->
+    <div class="card">
+      <label>Tone</label>
+      <ion-select [(ngModel)]="tone">
+        <ion-select-option value="formal">Formal</ion-select-option>
+        <ion-select-option value="casual">Casual</ion-select-option>
+      </ion-select>
+    </div>
+
+    <!-- GENERATE BUTTON -->
+    <ion-button expand="block" color="success" (click)="generateAI()">
+      Generate with AI
+    </ion-button>
+
+    <!-- MANUAL INPUT -->
+    <div class="card">
+      <label>Manual Input</label>
+
+      <ion-textarea
+        [(ngModel)]="enhancedText"
+        placeholder="Type your enhanced caption here. Make it engaging, professional, and grammatically correct."
+      ></ion-textarea>
+
+      <small>Minimum 10 characters</small>
+    </div>
+
+    <!-- COMMENTS -->
+    <div class="card">
+      <label>Your Comments (Optional)</label>
+
+      <ion-textarea
+        [(ngModel)]="comments"
+        placeholder="Add internal notes or feedback..."
+      ></ion-textarea>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="actions">
+      <ion-button fill="outline" (click)="close()">Cancel</ion-button>
+
+      <ion-button color="success" (click)="preview()">
+        Preview & Approve
+      </ion-button>
+    </div>
+
+  </div>
+
+</ion-content>

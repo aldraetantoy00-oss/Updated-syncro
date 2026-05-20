@@ -17,6 +17,10 @@ const routes: Routes = [
   {
     path: 'tabs',
     loadChildren: () => import('./pages/tabs/tabs.module').then(m => m.TabsPageModule)
+  },
+  {
+    path: 'enhance',
+    loadChildren: () => import('./pages/enhance/enhance.module').then( m => m.EnhancePageModule)
   }
 
 ];

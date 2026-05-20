@@ -1,0 +1,69 @@
+.page {
+  --background: #f9fafb;
+}
+
+.header {
+  background: linear-gradient(135deg, #166534, #15803d);
+  color: white;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.header p {
+  margin: 0;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.container {
+  padding: 16px;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.chips {
+  display: flex;
+  gap: 10px;
+}
+
+.chips button {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: white;
+}
+
+.chips button.active {
+  background: #16a34a;
+  color: white;
+  border-color: #16a34a;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.actions ion-button {
+  flex: 1;
+}

@@ -1,4 +1,77 @@
-<ion-content class="ion-padding">
-  <ion-textarea [(ngModel)]="content"></ion-textarea>
-  <ion-button expand="full" (click)="post()">Post</ion-button>
+<ion-content>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="top-bar">
+      <ion-icon name="menu-outline"></ion-icon>
+      <span>Syncro</span>
+      <ion-icon name="notifications-outline"></ion-icon>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- TITLE -->
+    <h2>Submit Content</h2>
+    <p class="subtitle">
+      Share your content with the PAIR office for review and enhancement
+    </p>
+
+    <!-- CAPTION -->
+    <div class="card">
+      <label>📄 Caption / Description</label>
+      <ion-textarea
+        [(ngModel)]="content"
+        placeholder="Write your post caption here. Be clear and descriptive..."
+        auto-grow="true">
+      </ion-textarea>
+    </div>
+
+    <!-- LINKS -->
+    <div class="card">
+      <label>🔗 Related Links (Optional)</label>
+
+      <div *ngFor="let link of links; let i = index" class="link-row">
+        <ion-input [(ngModel)]="links[i]" placeholder="https://example.com"></ion-input>
+
+        <ion-button fill="clear" color="danger" (click)="removeLink(i)" *ngIf="links.length > 1">
+          ✕
+        </ion-button>
+      </div>
+
+      <ion-button size="small" fill="outline" (click)="addLink()">
+        + Add Another Link
+      </ion-button>
+
+      <p class="hint">
+        Add links to related articles, events, or resources
+      </p>
+    </div>
+
+    <!-- IMAGE UPLOAD -->
+    <div class="card">
+      <label>🖼 Upload Images (Optional)</label>
+
+      <div class="upload-box">
+        <input type="file" multiple (change)="onFileSelected($event)" />
+
+        <ion-icon name="cloud-upload-outline"></ion-icon>
+        <p>Drag and drop images here</p>
+        <small>or click to browse</small>
+        <small>JPEG, PNG, GIF (Max 2MB each)</small>
+      </div>
+
+      <!-- PREVIEW -->
+      <div class="preview">
+        <img *ngFor="let img of imagePreviews" [src]="img" />
+      </div>
+    </div>
+
+    <!-- SUBMIT BUTTON -->
+    <ion-button expand="block" color="success" (click)="submit()" class="submit-btn">
+      Submit for Review
+    </ion-button>
+
+  </div>
+
 </ion-content>

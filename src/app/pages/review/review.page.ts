@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -7,18 +7,15 @@ import { PostService } from '../../services/post';
 @Component({
   selector: 'app-review',
   templateUrl: './review.page.html',
-
-  // 🔥 THIS IS THE KEY
+  styleUrls: ['./review.page.scss'],
   standalone: true,
-
-  // 🔥 THIS FIXES YOUR ERROR
   imports: [
     IonicModule,
     CommonModule,
     FormsModule
   ]
 })
-export class ReviewPage {
+export class ReviewPage implements OnInit {
 
   @Input() post: any;
 
@@ -30,6 +27,13 @@ export class ReviewPage {
     private postService: PostService
   ) {}
 
+  ngOnInit() {
+    // ✅ fallback (in case no enhance used)
+    if (!this.post.originalContent) {
+      this.post.originalContent = this.post.content;
+    }
+  }
+
   close() {
     this.modalCtrl.dismiss();
   }
@@ -38,6 +42,7 @@ export class ReviewPage {
     if (this.decision === 'approve') {
       this.postService.updatePost(this.post.id, {
         status: 'completed',
+        content: this.post.content, // ✅ save enhanced
         feedback: ''
       });
     } else {

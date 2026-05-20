@@ -1,46 +1,66 @@
-<ion-header>
-  <ion-toolbar color="success">
-    <ion-title>Review Caption</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="close()">Close</ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<ion-content class="page">
 
-<ion-content class="ion-padding">
+  <!-- HEADER -->
+  <div class="header">
+    <ion-icon name="arrow-back-outline" (click)="close()"></ion-icon>
+    <span>Review Enhanced Caption</span>
+  </div>
 
-  <h3>Original Caption</h3>
+  <div class="container">
 
-  <ion-card>
-    <ion-card-content>
-      {{ post.content }}
-    </ion-card-content>
-  </ion-card>
+    <!-- ORIGINAL -->
+    <div class="card">
+      <label>Original Caption</label>
+      <ion-textarea [value]="post.content" readonly></ion-textarea>
+    </div>
 
-  <h3>Decision</h3>
+    <!-- ENHANCED -->
+    <div class="card">
+      <label>Enhanced Caption</label>
+      <ion-textarea [(ngModel)]="post.content"></ion-textarea>
+    </div>
 
-  <ion-radio-group [(ngModel)]="decision">
+    <!-- COMMENTS -->
+    <div class="card">
+      <label>PAIR Staff Comments</label>
+      <ion-textarea [(ngModel)]="feedback"></ion-textarea>
+    </div>
 
-    <ion-item>
-      <ion-label>Approve</ion-label>
-      <ion-radio value="approve"></ion-radio>
-    </ion-item>
+    <!-- DECISION -->
+    <div class="card">
+      <label>Your Decision</label>
 
-    <ion-item>
-      <ion-label>Request Revision</ion-label>
-      <ion-radio value="reject"></ion-radio>
-    </ion-item>
+      <div class="option" [class.active]="decision==='approve'" (click)="decision='approve'">
+        <div class="radio"></div>
+        <div>
+          <strong>Approve</strong>
+          <p>Caption is good. Ready to post.</p>
+        </div>
+      </div>
 
-  </ion-radio-group>
+      <div class="option" [class.active]="decision==='reject'" (click)="decision='reject'">
+        <div class="radio"></div>
+        <div>
+          <strong>Request Revisions</strong>
+          <p>Send back to PAIR with feedback.</p>
+        </div>
+      </div>
 
-  <ion-textarea
-    *ngIf="decision === 'reject'"
-    [(ngModel)]="feedback"
-    placeholder="Write feedback..."
-  ></ion-textarea>
+      <div *ngIf="decision==='reject'" class="feedback">
+        <label>What needs improvement?</label>
+        <ion-textarea [(ngModel)]="feedback"></ion-textarea>
+      </div>
 
-  <ion-button expand="block" color="success" (click)="submit()">
-    Submit
-  </ion-button>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="actions">
+      <ion-button fill="outline" (click)="close()">Cancel</ion-button>
+      <ion-button color="success" (click)="submit()">
+        Approve & Update
+      </ion-button>
+    </div>
+
+  </div>
 
 </ion-content>

@@ -1,0 +1,80 @@
+.page {
+  --background: #f9fafb;
+}
+
+.header {
+  background: linear-gradient(135deg, #166534, #15803d);
+  color: white;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+}
+
+.container {
+  padding: 16px;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.option {
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  align-items: flex-start;
+}
+
+.option.active {
+  border-color: #16a34a;
+  background: #f0fdf4;
+}
+
+.radio {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #9ca3af;
+  border-radius: 50%;
+  margin-top: 3px;
+}
+
+.option.active .radio {
+  border-color: #16a34a;
+  background: #16a34a;
+}
+
+.option p {
+  margin: 0;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.feedback {
+  margin-top: 10px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.actions ion-button {
+  flex: 1;
+}

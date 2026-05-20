@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { PostService } from '../../services/post';
 import { ModalController } from '@ionic/angular';
-import { ReviewPage } from '../review/review.page'; // ✅ IMPORTANT
+import { ReviewPage } from '../review/review.page';
+import { EnhancePage } from '../enhance/enhance.page'; // ✅ ADD THIS
 
 @Component({
   selector: 'app-dashboard',
@@ -40,6 +41,7 @@ export class DashboardPage implements OnInit {
     });
   }
 
+  // ✅ REVIEW (separate button)
   async openReview(post: any) {
     const modal = await this.modalCtrl.create({
       component: ReviewPage,
@@ -51,4 +53,13 @@ export class DashboardPage implements OnInit {
     await modal.present();
   }
 
+  // ✅ ENHANCE (EYE BUTTON)
+  async openEnhance(post: any) {
+    const modal = await this.modalCtrl.create({
+      component: EnhancePage,
+      componentProps: { post }
+    });
+
+    await modal.present();
+  }
 }

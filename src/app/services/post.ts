@@ -1,34 +1,41 @@
-import { Injectable } from '@angular/core';
-import { Firestore, collection, addDoc, collectionData, doc, updateDoc } from '@angular/fire/firestore';
+import { Injectable, inject } from '@angular/core';
+import {
+  Firestore,
+  collection,
+  addDoc,
+  collectionData,
+  doc,
+  updateDoc
+} from '@angular/fire/firestore';
 
 @Injectable({ providedIn: 'root' })
 export class PostService {
 
-  constructor(private firestore: Firestore) {}
+  private firestore = inject(Firestore);
 
-  addPost(content: string) {
-  const ref = collection(this.firestore, 'posts');
-  return addDoc(ref, {
-    content,
-    status: 'pending',     // pending | in_review | completed
-    feedback: '',
-    createdAt: new Date()
-  });
-}
+  // ✅ SAVE POST
+  async addPost(data: any) {
+    const refCol = collection(this.firestore, 'posts');
 
-updatePost(id: string, data: any) {
-  const ref = doc(this.firestore, `posts/${id}`);
-  return updateDoc(ref, data);
-
+    return addDoc(refCol, {
+      content: data.content || '',
+      links: data.links || [],
+      images: data.images || [], // base64 (compressed)
+      status: 'pending',
+      feedback: '',
+      createdAt: new Date()
+    });
   }
 
+  // ✅ GET POSTS
   getPosts() {
-    const ref = collection(this.firestore, 'posts');
-    return collectionData(ref, { idField: 'id' });
+    const refCol = collection(this.firestore, 'posts');
+    return collectionData(refCol, { idField: 'id' });
   }
 
-  completePost(id: string) {
-    const ref = doc(this.firestore, `posts/${id}`);
-    return updateDoc(ref, { status: 'completed' });
+  // ✅ UPDATE POST
+  updatePost(id: string, data: any) {
+    const refDoc = doc(this.firestore, `posts/${id}`);
+    return updateDoc(refDoc, data);
   }
 }
