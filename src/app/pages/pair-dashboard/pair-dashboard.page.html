@@ -1,0 +1,233 @@
+<ion-content [fullscreen]="true">
+
+  <div class="page">
+
+    <!-- HEADER -->
+    <div class="header">
+
+      <div class="top">
+
+        <ion-menu-button>
+          <ion-icon slot="icon-only" name="menu-outline"></ion-icon>
+        </ion-menu-button>
+
+        <span>Syncro</span>
+
+        <ion-icon name="notifications-outline"></ion-icon>
+
+      </div>
+
+      <h2>Welcome back,</h2>
+
+      <h1>PAIR Staff 👮</h1>
+
+      <p>Here's what's happening today.</p>
+
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid">
+
+      <!-- TOTAL -->
+      <div class="stat-card">
+
+        <div class="stat-top">
+
+          <span>Total Submissions</span>
+
+          <ion-icon
+            name="document-outline"
+            class="blue"
+          ></ion-icon>
+
+        </div>
+
+        <h1>{{ totalSubmissions }}</h1>
+
+      </div>
+
+      <!-- TO REVIEW -->
+      <div class="stat-card">
+
+        <div class="stat-top">
+
+          <span>To Review</span>
+
+          <ion-icon
+            name="hourglass-outline"
+            class="yellow"
+          ></ion-icon>
+
+        </div>
+
+        <h1>{{ toReview }}</h1>
+
+      </div>
+
+      <!-- IN REVIEW -->
+      <div class="stat-card">
+
+        <div class="stat-top">
+
+          <span>In Review</span>
+
+          <ion-icon
+            name="time-outline"
+            class="gray"
+          ></ion-icon>
+
+        </div>
+
+        <h1>{{ inReview }}</h1>
+
+      </div>
+
+      <!-- APPROVED -->
+      <div class="stat-card">
+
+        <div class="stat-top">
+
+          <span>Approved</span>
+
+          <ion-icon
+            name="checkmark-circle"
+            class="green"
+          ></ion-icon>
+
+        </div>
+
+        <h1>{{ approved }}</h1>
+
+      </div>
+
+    </div>
+
+    <!-- SECTION HEADER -->
+    <div class="section-row">
+
+      <span class="section-title">
+        Recent Submissions
+      </span>
+
+      <!-- SEE ALL BUTTON -->
+      <div
+        class="see-all-btn"
+        routerLink="/pair-tabs/queue"
+      >
+
+        <span>See All</span>
+
+        <ion-icon name="arrow-forward-outline"></ion-icon>
+
+      </div>
+
+    </div>
+
+    <!-- RECENT SUBMISSIONS -->
+    <div
+      *ngFor="let submission of submissions.slice(0,3)"
+      class="recent-card"
+      (click)="viewDetails(submission)"
+    >
+
+      <!-- STATUS LINE -->
+      <div
+        class="status-line"
+        [ngClass]="{
+          'pending-line': submission.status === 'pending',
+          'review-line': submission.status === 'in_review' || submission.workflow_status === 'submitted',
+          'approved-line': submission.status === 'approved',
+          'posted-line': submission.status === 'posted'
+        }"
+      ></div>
+
+      <!-- CONTENT -->
+      <div class="content">
+
+        <!-- CAPTION -->
+        <strong class="caption">
+
+          {{
+            submission.original_caption ||
+            submission.enhanced_caption ||
+            'No caption'
+          }}
+
+        </strong>
+
+        <!-- META -->
+        <div class="meta">
+
+          <!-- PENDING -->
+          <ion-badge
+            color="warning"
+            *ngIf="submission.status === 'pending'"
+          >
+            Pending
+          </ion-badge>
+
+          <!-- REVIEW -->
+          <ion-badge
+            color="primary"
+            *ngIf="submission.status === 'in_review' || submission.workflow_status === 'submitted'"
+          >
+            Reviewing
+          </ion-badge>
+
+          <!-- APPROVED -->
+          <ion-badge
+            color="success"
+            *ngIf="submission.status === 'approved'"
+          >
+            Approved
+          </ion-badge>
+
+          <!-- POSTED -->
+          <ion-badge
+            color="secondary"
+            *ngIf="submission.status === 'posted'"
+          >
+            Posted
+          </ion-badge>
+
+          <!-- DATE -->
+          <span class="date">
+
+            {{
+              submission.created_at
+                ? (submission.created_at
+                    | date:'MMM d, y • h:mm a')
+                : 'No date'
+            }}
+
+          </span>
+
+        </div>
+
+        <!-- WORKFLOW -->
+        <div class="workflow-chip">
+
+          <ion-icon
+            name="checkmark-circle-outline"
+          ></ion-icon>
+
+          Organization #{{ submission.user_id }}
+
+        </div>
+
+      </div>
+
+      <!-- VIEW BUTTON -->
+      <div class="eye-btn">
+
+        <ion-icon
+          name="arrow-forward-outline"
+        ></ion-icon>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</ion-content>

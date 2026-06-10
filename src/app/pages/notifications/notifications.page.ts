@@ -21,11 +21,17 @@ export class NotificationsPage implements OnInit {
 
   async getNotifications() {
 
-    const { data, error } =
-      await this.supabaseService.supabase
-        .from('notifications')
-        .select('*')
-        .order('created_at', { ascending: false });
+    const appUserId = await this.supabaseService.getAppUserId();
+    if (appUserId === null) {
+      this.notifications = [];
+      return;
+    }
+
+    const { data, error } = await this.supabaseService.supabase
+      .from('notifications')
+      .select('*')
+      .eq('notifiable_id', appUserId)
+      .order('created_at', { ascending: false });
 
     console.log(data);
     console.log(error);

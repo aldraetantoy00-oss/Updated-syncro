@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
 
 import { ReviewPage } from '../review/review.page';
@@ -27,7 +28,8 @@ export class DashboardPage implements OnInit {
 
   constructor(
     private modalCtrl: ModalController,
-    private supabaseService: SupabaseService
+    private supabaseService: SupabaseService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -39,13 +41,18 @@ export class DashboardPage implements OnInit {
   // GET POSTS
   async getPosts() {
 
-    const { data, error } =
-      await this.supabaseService.supabase
-        .from('submissions')
-        .select('*')
-        .order('created_at', {
-          ascending: false
-        });
+    const appUserId = await this.supabaseService.getAppUserId();
+    if (appUserId === null) {
+      // no numeric profile id available - avoid querying with UUID which causes DB type errors
+      this.posts = [];
+      return;
+    }
+
+    const { data, error } = await this.supabaseService.supabase
+      .from('submissions')
+      .select('*')
+      .eq('user_id', appUserId)
+      .order('created_at', { ascending: false });
 
     console.log(
       'SUPABASE DATA:',
@@ -142,5 +149,10 @@ export class DashboardPage implements OnInit {
       this.getPosts();
 
     });
+  }
+
+  // VIEW SUBMISSION DETAILS
+  viewSubmissionDetails(post: any) {
+    this.router.navigateByUrl(`/submission-details?id=${post.id}`);
   }
 }

@@ -7,7 +7,9 @@
 
       <div class="top">
 
-        <ion-icon name="menu-outline"></ion-icon>
+        <ion-menu-button>
+          <ion-icon slot="icon-only" name="menu-outline"></ion-icon>
+        </ion-menu-button>
 
         <span>Syncro</span>
 
@@ -17,7 +19,7 @@
 
       <h2>Welcome back,</h2>
 
-      <h1>AdminOrg 👋</h1>
+      <h1>SampleOrg 👋</h1>
 
       <p>Here’s what’s happening today.</p>
 
@@ -124,6 +126,7 @@
 <div
   *ngFor="let post of posts.slice(0,3)"
   class="recent-card"
+  (click)="viewSubmissionDetails(post)"
 >
 
   <!-- STATUS LINE -->
@@ -204,14 +207,13 @@
 
   </div>
 
-  <!-- EYE BUTTON -->
+  <!-- VIEW BUTTON -->
   <div
     class="eye-btn"
-    (click)="openEnhance(post)"
   >
 
     <ion-icon
-      name="eye-outline"
+      name="arrow-forward-outline"
     ></ion-icon>
 
   </div>

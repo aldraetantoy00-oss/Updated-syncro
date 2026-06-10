@@ -32,6 +32,10 @@
  * https://ionicframework.com/docs/theming/dark-mode
  */
 
+/* Disabled dark theme palettes so the app appearance stays the same
+	regardless of the OS/browser `prefers-color-scheme` setting. */
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import "@ionic/angular/css/palettes/dark.system.css";
+/* @import "@ionic/angular/css/palettes/dark.system.css"; */
+
+/* bottom tab styles moved to the page-local stylesheet */

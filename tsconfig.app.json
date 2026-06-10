@@ -7,9 +7,16 @@
   },
   "files": [
     "src/main.ts",
-    "src/polyfills.ts"
+    "src/polyfills.ts",
+    "src/app/pages/all-submissions/all-submissions.page.ts"
   ],
   "include": [
-    "src/**/*.d.ts"
+    "src/**/*.d.ts",
+    "src/**/*.ts"
+  ]
+  ,
+  "exclude": [
+    "src/**/*.spec.ts",
+    "src/test.ts"
   ]
 }

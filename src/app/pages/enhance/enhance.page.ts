@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { SupabaseService } from '../../services/supabase';
+import { AuthRoleService } from '../../services/auth-role.service';
 
 @Component({
   selector: 'app-enhance',
@@ -18,11 +19,20 @@ export class EnhancePage {
 
   enhancedText = '';
 
-  comments = '';
+  feedback = '';
+
+  decision = 'approve';
+
+  allowPairActions = false;
+
+  isSubmitting = false;
+
+  showPostedOption = false;
 
   constructor(
     private modalCtrl: ModalController,
     private supabaseService: SupabaseService
+    , private authRole: AuthRoleService
   ) {}
 
   ngOnInit() {
@@ -30,6 +40,19 @@ export class EnhancePage {
     // SHOW ORIGINAL CAPTION
     this.enhancedText =
       this.post.original_caption || '';
+
+    // If submission is already approved, show option to post it
+    this.showPostedOption = this.post.status === 'approved' || this.post.workflow_status === 'approved';
+
+    // If already approved and showing enhanced, use that
+    if (this.showPostedOption && this.post.enhanced_caption) {
+      this.enhancedText = this.post.enhanced_caption;
+    }
+
+    // determine if current user may run PAIR/admin actions (generate/preview/approve)
+    this.authRole.canPerformPairActions().then(flag => {
+      this.allowPairActions = !!flag;
+    }).catch(() => { this.allowPairActions = false; });
 
   }
 
@@ -46,83 +69,107 @@ This version is more engaging, professional, and polished.`;
 
   }
 
-  // SAVE
-  async preview() {
+  // SUBMIT REVIEW (Approve, Reject, or Mark as Posted)
+  async submitReview() {
 
-    // UPDATE SUBMISSION
-    const { data, error } =
-      await this.supabaseService.supabase
-        .from('submissions')
-        .update({
-
-          enhanced_caption: this.enhancedText,
-
-          pair_feedback: this.comments,
-
-          status: 'approved',
-
-          workflow_status: 'approved',
-
-          enhanced_at: new Date()
-
-        })
-        .eq('id', this.post.id);
-
-    console.log(data);
-    console.log(error);
-
-    // ERROR
-    if (error) {
-
-      alert('Failed to update');
-
+    // Validation
+    if (!this.allowPairActions) {
+      alert('This action is restricted.');
       return;
     }
 
-    // INSERT NOTIFICATION
-    const {
-      data: notifData,
-      error: notifError
-    } =
-      await this.supabaseService.supabase
-  .from('notifications')
-  .insert([
-    {
-
-      id: crypto.randomUUID(),
-
-      type:
-        'App\\Notifications\\EnhancementReadyForReview',
-
-      notifiable_type:
-        'App\\Models\\User',
-
-      notifiable_id: 1,
-
-      data: JSON.stringify({
-
-        title:
-          'Caption ready for review',
-
-        message:
-          'PAIR approved a submission.'
-
-      }),
-
-      created_at: new Date(),
-
-      updated_at: new Date()
-
+    if (this.decision === 'approve' && this.enhancedText.trim().length < 10) {
+      alert('Enhanced caption must be at least 10 characters');
+      return;
     }
-  ]);
 
-    console.log('NOTIF DATA:', notifData);
-    console.log('NOTIF ERROR:', notifError);
+    this.isSubmitting = true;
 
-    // CLOSE
-    this.modalCtrl.dismiss({
-      refreshed: true
-    });
+    try {
+      // Prepare update object
+      const updateObj: any = {
+        pair_feedback: this.feedback,
+        reviewed_at: new Date()
+      };
 
+      // Handle different decisions
+      if (this.decision === 'approve') {
+        updateObj.enhanced_caption = this.enhancedText;
+        updateObj.status = 'approved';
+        updateObj.workflow_status = 'approved';
+      } else if (this.decision === 'reject') {
+        updateObj.status = 'pending';
+        updateObj.workflow_status = 'rejected';
+      } else if (this.decision === 'posted') {
+        // Mark as posted (already approved)
+        updateObj.status = 'posted';
+        updateObj.workflow_status = 'posted';
+        updateObj.posted_at = new Date();
+      }
+
+      // Update submission
+      const { data, error } =
+        await this.supabaseService.supabase
+          .from('submissions')
+          .update(updateObj)
+          .eq('id', this.post.id);
+
+      console.log('✅ Review submitted:', data);
+      console.log('Review error:', error);
+
+      if (error) {
+        throw error;
+      }
+
+      // Get user ID for notification
+      const user = await this.supabaseService.getUser();
+      const notifiable_id = this.post.user_id || user?.id || 1;
+
+      // INSERT NOTIFICATION
+      let notifType = 'App\\Notifications\\SubmissionApproved';
+      let notifMessage = 'Your submission was approved by PAIR!';
+      let notifTitle = 'Submission Approved';
+
+      if (this.decision === 'reject') {
+        notifType = 'App\\Notifications\\SubmissionRejected';
+        notifMessage = 'Your submission needs revisions. Please check feedback.';
+        notifTitle = 'Submission Rejected';
+      } else if (this.decision === 'posted') {
+        notifType = 'App\\Notifications\\SubmissionPosted';
+        notifMessage = 'Your submission has been posted!';
+        notifTitle = 'Submission Posted';
+      }
+
+      const { error: notifError } =
+        await this.supabaseService.supabase
+          .from('notifications')
+          .insert([{
+            id: crypto.randomUUID(),
+            type: notifType,
+            notifiable_type: 'App\\Models\\User',
+            notifiable_id: notifiable_id,
+            data: JSON.stringify({
+              title: notifTitle,
+              message: notifMessage,
+              submission_id: this.post.id
+            }),
+            created_at: new Date(),
+            updated_at: new Date()
+          }]);
+
+      console.log('✅ Notification sent');
+      if (notifError) console.warn('Notification error:', notifError);
+
+      this.isSubmitting = false;
+
+      // Show success and close
+      alert(`Submission ${this.decision === 'approve' ? 'approved' : this.decision === 'reject' ? 'rejected' : 'posted'} successfully!`);
+      this.modalCtrl.dismiss({ refreshed: true });
+
+    } catch (e: any) {
+      this.isSubmitting = false;
+      console.error('Review submission error:', e);
+      alert('Failed to submit review: ' + (e?.message || 'Unknown error'));
+    }
   }
 }

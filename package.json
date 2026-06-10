@@ -10,6 +10,9 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint"
+    ,
+    "inspect-passwords": "node scripts/inspect_fix_passwords.js",
+    "inspect-passwords:fix": "node scripts/inspect_fix_passwords.js --fix"
   },
   "private": true,
   "dependencies": {
@@ -29,6 +32,7 @@
     "@capacitor/status-bar": "8.0.2",
     "@ionic/angular": "^8.0.0",
     "@supabase/supabase-js": "^2.106.0",
+    "bcryptjs": "^3.0.3",
     "firebase": "^11.10.0",
     "ionicons": "^7.0.0",
     "openai": "^6.34.0",

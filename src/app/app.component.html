@@ -1,3 +1,9 @@
 <ion-app>
-  <ion-router-outlet></ion-router-outlet>
+
+  <ion-menu side="start" menuId="main-menu" contentId="main-content" (ionDidOpen)="sidebar.onMenuOpen()">
+    <app-sidebar #sidebar="sidebar"></app-sidebar>
+  </ion-menu>
+
+  <ion-router-outlet id="main-content"></ion-router-outlet>
+
 </ion-app>

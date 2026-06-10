@@ -1,0 +1,174 @@
+<ion-content [fullscreen]="true">
+
+  <div class="page" *ngIf="!loading">
+
+    <!-- HEADER -->
+    <div class="header">
+      <div class="top">
+        <ion-button fill="clear" color="light" (click)="goBack()">
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </ion-button>
+        <h1>Submission Details</h1>
+        <div style="width: 40px;"></div>
+      </div>
+    </div>
+
+    <!-- SUBMISSION FOUND -->
+    <div *ngIf="submission" class="submission-container">
+
+      <!-- STATUS SECTION -->
+      <div class="status-section">
+        <ion-badge [color]="getStatusColor(submission.status)">
+          <ion-icon [name]="getStatusIcon(submission.status)"></ion-icon>
+          {{ getStatusText(submission.status) }}
+        </ion-badge>
+        <span class="workflow-status">{{ submission.workflow_status | uppercase }}</span>
+      </div>
+
+      <!-- ORIGINAL CAPTION -->
+      <div class="detail-card">
+        <div class="card-header">
+          <h3>📝 Original Caption</h3>
+          <span class="date">{{ submission.created_at | date:'MMM d, y • h:mm a' }}</span>
+        </div>
+        <div class="card-content">
+          {{ submission.original_caption || 'No caption provided' }}
+        </div>
+      </div>
+
+      <!-- ENHANCED CAPTION -->
+      <div class="detail-card" *ngIf="submission.enhanced_caption">
+        <div class="card-header">
+          <h3>✨ Enhanced Caption</h3>
+          <span class="date">{{ submission.enhanced_at | date:'MMM d, y • h:mm a' }}</span>
+        </div>
+        <div class="card-content enhanced">
+          {{ submission.enhanced_caption }}
+        </div>
+      </div>
+
+      <!-- FEEDBACK -->
+      <div class="detail-card" *ngIf="submission.pair_feedback">
+        <div class="card-header">
+          <h3>💬 PAIR Feedback</h3>
+        </div>
+        <div class="card-content feedback">
+          {{ submission.pair_feedback }}
+        </div>
+      </div>
+
+      <!-- ATTACHMENTS/LINKS -->
+      <div class="detail-card" *ngIf="submission.links && submission.links.length > 0">
+        <div class="card-header">
+          <h3>🔗 Related Links</h3>
+        </div>
+        <div class="links-list">
+          <div *ngFor="let link of submission.links" class="link-item">
+            <ion-icon name="open-outline"></ion-icon>
+            <a [href]="link" target="_blank">{{ link }}</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- MEDIA -->
+      <div class="detail-card" *ngIf="submission.media_paths && submission.media_paths.length > 0">
+        <div class="card-header">
+          <h3>🖼️ Attached Media</h3>
+        </div>
+        <div class="media-grid">
+          <img *ngFor="let media of submission.media_paths" 
+               [src]="media" 
+               alt="Media attachment"
+               class="media-item">
+        </div>
+      </div>
+
+      <!-- TIMELINE -->
+      <div class="detail-card">
+        <div class="card-header">
+          <h3>📋 Timeline</h3>
+        </div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-marker submitted"></div>
+            <div class="timeline-content">
+              <strong>Submitted</strong>
+              <span class="time">{{ submission.created_at | date:'MMM d, y • h:mm a' }}</span>
+            </div>
+          </div>
+
+          <div class="timeline-item" *ngIf="submission.enhanced_at">
+            <div class="timeline-marker enhanced"></div>
+            <div class="timeline-content">
+              <strong>Enhanced by PAIR</strong>
+              <span class="time">{{ submission.enhanced_at | date:'MMM d, y • h:mm a' }}</span>
+            </div>
+          </div>
+
+          <div class="timeline-item" *ngIf="submission.reviewed_at">
+            <div class="timeline-marker reviewed"></div>
+            <div class="timeline-content">
+              <strong>Reviewed</strong>
+              <span class="time">{{ submission.reviewed_at | date:'MMM d, y • h:mm a' }}</span>
+            </div>
+          </div>
+
+          <div class="timeline-item" *ngIf="submission.status === 'approved' || submission.status === 'completed'">
+            <div class="timeline-marker approved"></div>
+            <div class="timeline-content">
+              <strong>Approved</strong>
+              <span class="time">Ready for publishing</span>
+            </div>
+          </div>
+
+          <div class="timeline-item" *ngIf="submission.status === 'posted'">
+            <div class="timeline-marker posted"></div>
+            <div class="timeline-content">
+              <strong>Posted</strong>
+              <span class="time">Published and live</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- METADATA -->
+      <div class="detail-card metadata">
+        <div class="meta-row">
+          <span class="meta-label">Organization ID</span>
+          <span class="meta-value">{{ submission.user_id }}</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Submission ID</span>
+          <span class="meta-value">{{ submission.id }}</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Current Status</span>
+          <span class="meta-value">
+            <ion-badge [color]="getStatusColor(submission.status)">
+              {{ getStatusText(submission.status) }}
+            </ion-badge>
+          </span>
+        </div>
+      </div>
+
+      
+
+    </div>
+
+    <!-- NOT FOUND -->
+    <div *ngIf="!submission" class="not-found">
+      <ion-icon name="warning-outline"></ion-icon>
+      <h2>Submission Not Found</h2>
+      <p>The submission you're looking for doesn't exist or has been deleted.</p>
+      <ion-button (click)="goBack()">Go Back</ion-button>
+    </div>
+
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading-container" *ngIf="loading">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Loading submission details...</p>
+  </div>
+
+</ion-content>

@@ -5,99 +5,135 @@
     <!-- HEADER -->
     <div class="header">
 
-      <div class="top">
+      <div class="top-bar">
 
-        <ion-button
-          fill="clear"
-          color="light"
-          routerLink="/tabs/dashboard"
-        >
-          <ion-icon name="arrow-back-outline"></ion-icon>
-        </ion-button>
+        <ion-icon name="menu-outline"></ion-icon>
 
-        <h1>All Submissions</h1>
+        <span>Syncro</span>
+
+        <ion-icon name="notifications-outline"></ion-icon>
 
       </div>
 
-      <p>
-        View all submitted content and statuses
-      </p>
+      </div>
 
-    </div>
+      <!-- Filters / Search / Apply moved below header for compact layout -->
+      <div *ngIf="role !== 'ORGANIZATION'" class="controls">
+        <div class="filters">
 
-    <!-- POSTS -->
-    <div
-      *ngFor="let post of posts"
-      class="recent-card"
-    >
+          <div class="filters-top">
+            <div class="filters-left">
+              <ion-button fill="solid" (click)="toggleFilters()" class="filters-btn">
+                <ion-icon name="funnel-outline" class="filters-icon"></ion-icon>
+                <span class="filters-label">Filters</span>
+              </ion-button>
+            </div>
 
-      <!-- STATUS LINE -->
-      <div
-        class="status-line"
-        [ngClass]="{
-          'pending-line': post.status === 'pending',
-          'review-line': post.status === 'in_review',
-          'approved-line': post.status === 'completed'
-        }"
-      ></div>
+            <div class="search-row">
+              <ion-input placeholder="Search content..." [(ngModel)]="searchQuery"></ion-input>
+            </div>
 
-      <!-- CONTENT -->
-      <div class="content">
+            <div class="apply-wrap">
+              <ion-button (click)="applyFilters()" class="apply-btn">Apply</ion-button>
+            </div>
+          </div>
 
-        <strong class="caption">
-
-          {{
-            post.original_caption ||
-            post.enhanced_caption ||
-            'No caption'
-          }}
-
-        </strong>
-
-        <!-- META -->
-        <div class="meta">
-
-          <ion-badge
-            color="warning"
-            *ngIf="post.status === 'pending'"
-          >
-            Pending
-          </ion-badge>
-
-          <ion-badge
-            color="primary"
-            *ngIf="post.status === 'in_review'"
-          >
-            Reviewing
-          </ion-badge>
-
-          <ion-badge
-            color="success"
-            *ngIf="post.status === 'completed'"
-          >
-            Approved
-          </ion-badge>
-
-          <span class="date">
-
-            {{ post.created_at | date:'MMM d, y • h:mm a' }}
-
-          </span>
+          <div class="filters-body" [class.hidden]="!showFilters">
+            <ion-item>
+              <ion-label>Status</ion-label>
+              <ion-select placeholder="Any" [(ngModel)]="filterStatus">
+                <ion-select-option value="">Any</ion-select-option>
+                <ion-select-option value="pending">Pending</ion-select-option>
+                <ion-select-option value="in_review">In Review</ion-select-option>
+                <ion-select-option value="approved">Approved</ion-select-option>
+                <ion-select-option value="posted">Posted</ion-select-option>
+              </ion-select>
+            </ion-item>
+          </div>
 
         </div>
-
       </div>
 
-      <!-- EYE BUTTON -->
-      <div
-        class="eye-btn"
-        (click)="openEnhance(post)"
-      >
+    <!-- TABLE VIEW (desktop) -->
+    <div class="table-view">
+      <table>
+        <thead>
+          <tr>
+            <th>Organization</th>
+            <th>Title / Caption</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let post of filteredPosts">
+            <td>Organization #{{ post.user_id }}</td>
+            <td class="title">{{ post.original_caption || post.enhanced_caption || 'No caption' }}</td>
+            <td>
+              <ion-badge [color]="statusColor(post)">{{ statusLabel(post) }}</ion-badge>
+            </td>
+            <td>{{ post.created_at | date:'MMM d, y' }}</td>
+            <td>
+              <div class="actions">
+                <ng-container *ngIf="role === 'PAIR'; else orgArrow">
+                  <ion-button size="small" fill="outline" (click)="viewDetails(post)">Review</ion-button>
+                  <ion-button size="small" color="tertiary" (click)="openEnhance(post)">Evaluate</ion-button>
+                  <ion-button size="small" color="danger" fill="clear" (click)="reject(post)">Reject</ion-button>
+                </ng-container>
+                <ng-template #orgArrow>
+                  <ion-button size="small" fill="clear" class="details-arrow" (click)="viewDetails(post)" aria-label="Open submission details">
+                    <ion-icon name="arrow-forward-outline"></ion-icon>
+                  </ion-button>
+                </ng-template>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-        <ion-icon name="eye-outline"></ion-icon>
+    <!-- CARDS VIEW (mobile-first) -->
+    <div class="cards-view">
+      <div *ngFor="let post of filteredPosts" class="recent-card">
+
+          <div class="content">
+            <div class="org">{{ post.org_name ? post.org_name : ('Organization #' + post.user_id) }}</div>
+            <p class="subtitle">{{ post.original_caption || post.enhanced_caption || 'No caption' }}</p>
+
+            <div class="meta">
+              <ion-badge [color]="statusColor(post)">{{ statusLabel(post) }}</ion-badge>
+              <span class="date">{{ post.created_at | date:'MMM d, y • h:mm a' }}</span>
+            </div>
+          </div>
+
+          <div class="actions-right">
+            <ng-container *ngIf="role === 'PAIR'; else orgCardArrow">
+              <ion-button size="small" fill="outline" (click)="openEnhance(post)">Evaluate</ion-button>
+              <ion-button size="small" fill="outline" (click)="viewDetails(post)">Review</ion-button>
+              <ion-button size="small" fill="outline" (click)="reject(post)">Reject</ion-button>
+            </ng-container>
+            <ng-template #orgCardArrow>
+              <ion-button size="small" fill="clear" class="card-arrow" (click)="viewDetails(post)" aria-label="Open submission details">
+                <ion-icon name="arrow-forward-outline"></ion-icon>
+              </ion-button>
+            </ng-template>
+          </div>
 
       </div>
+    </div>
 
+    <!-- EMPTY STATE / DEBUG -->
+    <div *ngIf="filteredPosts?.length === 0" class="empty-state">
+      <div class="empty-card">
+        <h3>No submissions found</h3>
+        <p>Please check filters or try refreshing.</p>
+        <div class="debug">
+          <ion-button (click)="getPosts()">Refresh</ion-button>
+          <pre style="white-space:pre-wrap">Role: {{ (authRole?.getCachedRole && authRole.getCachedRole()) || 'unknown' }}</pre>
+          <pre style="white-space:pre-wrap">Posts fetched: {{ posts?.length || 0 }}</pre>
+        </div>
+      </div>
     </div>
 
   </div>

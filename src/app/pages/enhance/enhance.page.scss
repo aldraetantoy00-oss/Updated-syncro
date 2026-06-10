@@ -3,9 +3,9 @@
 }
 
 .header {
-  background: linear-gradient(135deg, #166534, #15803d);
+  background: linear-gradient(135deg, var(--syncro-green-dark) 0%, var(--syncro-green) 100%);
   color: white;
-  padding: 16px;
+  padding: 14px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -38,6 +38,14 @@ label {
   font-weight: 600;
   display: block;
   margin-bottom: 8px;
+  font-size: 14px;
+}
+
+small {
+  display: block;
+  margin-top: 8px;
+  color: var(--ion-color-medium);
+  font-size: 12px;
 }
 
 .chips {
@@ -48,14 +56,59 @@ label {
 .chips button {
   padding: 6px 12px;
   border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid rgba(229,231,235,1);
   background: white;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 .chips button.active {
-  background: #16a34a;
-  color: white;
-  border-color: #16a34a;
+  background: var(--ion-color-primary);
+  color: var(--ion-color-primary-contrast);
+  border-color: var(--ion-color-primary);
+}
+
+.decision-chips {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.decision-chips button {
+  padding: 12px;
+  border-radius: 8px;
+  border: 2px solid rgba(229,231,235,1);
+  background: white;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.approve-chip.active {
+  border-color: var(--ion-color-secondary);
+  background-color: rgba(16,185,129,0.08);
+  color: var(--ion-color-secondary);
+}
+
+.reject-chip.active {
+  border-color: var(--ion-color-danger);
+  background-color: rgba(239,68,68,0.06);
+  color: var(--ion-color-danger);
+}
+
+.generate-btn {
+  margin-bottom: 12px;
+  --background: var(--ion-color-secondary);
+  color: var(--ion-color-secondary-contrast);
+}
+
+.submit-review-btn {
+  font-weight: 600;
 }
 
 .actions {
@@ -66,4 +119,19 @@ label {
 
 .actions ion-button {
   flex: 1;
+}
+
+.info-text {
+  color: var(--ion-color-medium);
+  font-size: 13px;
+  margin: 8px 0 16px 0;
+  line-height: 1.5;
+}
+
+.posted-btn {
+  margin-top: 8px;
+
+  ion-icon {
+    font-size: 18px;
+  }
 }

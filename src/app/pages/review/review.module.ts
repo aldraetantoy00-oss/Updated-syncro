@@ -13,8 +13,8 @@ import { ReviewPage } from './review.page';
     CommonModule,
     FormsModule,
     IonicModule,
-    ReviewPageRoutingModule
-  ],
-  declarations: [ReviewPage]
+    ReviewPageRoutingModule,
+    ReviewPage
+  ]
 })
 export class ReviewPageModule {}

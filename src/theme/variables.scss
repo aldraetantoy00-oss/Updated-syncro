@@ -1,2 +1,26 @@
+// Syncro theme variables
 // For information on how to create your own theme, please refer to:
 // https://ionicframework.com/docs/theming/
+
+:root {
+	/* Syncro primary palette */
+	--syncro-green: #15803d;
+	--syncro-green-dark: #166534;
+	--syncro-teal: #10b981;
+	--syncro-accent: #667eea;
+
+	/* Ionic color mapping */
+	--ion-color-primary: var(--syncro-green);
+	--ion-color-primary-contrast: #ffffff;
+	--ion-color-primary-shade: var(--syncro-green-dark);
+
+	--ion-color-secondary: var(--syncro-teal);
+	--ion-color-secondary-contrast: #ffffff;
+
+	--ion-color-success: #16a34a;
+	--ion-color-warning: #f59e0b;
+	--ion-color-danger: #ef4444;
+	--ion-color-medium: #6b7280;
+
+	--ion-background-color: #f5f7fb;
+}

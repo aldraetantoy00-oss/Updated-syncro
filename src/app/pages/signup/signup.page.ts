@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
 import { SupabaseService } from '../../services/supabase';
 
+
+
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.page.html',
@@ -52,45 +54,26 @@ export class SignupPage {
 
     try {
 
-      // CREATE AUTH ACCOUNT
-      const { data, error } =
-        await this.supabaseService.supabase.auth.signUp({
+      // Create user in `users` table
+      const res: any = await this.supabaseService.signUpWithUsersTable({
+        username: this.username,
+        email: this.email,
+        password: this.password,
+        role: 'org'
+      });
 
-          email: this.email,
-
-          password: this.password
-
-        });
+      const data = res?.data ?? null;
+      const error = res?.error ?? null;
 
       if (error) {
-
         loading.dismiss();
-
-        alert(error.message);
-
+        alert((error as any)?.message ? (error as any).message : String(error) || 'Failed to create account');
         return;
       }
 
-      // INSERT USER DATA
-      await this.supabaseService.supabase
-        .from('users')
-        .insert([{
-
-          id: data.user?.id,
-
-          username: this.username,
-
-          email: this.email,
-
-          role: 'org'
-
-        }]);
-
       loading.dismiss();
-
       alert('Account created successfully');
-
-      this.router.navigateByUrl('/login');
+      this.router.navigateByUrl('/login', { replaceUrl: true });
 
     } catch(err) {
 

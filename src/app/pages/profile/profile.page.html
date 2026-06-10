@@ -1,0 +1,91 @@
+<ion-content [fullscreen]="true">
+
+  <div class="page">
+
+    <!-- HEADER -->
+    <div class="header">
+      <div class="top">
+        <ion-button fill="clear" color="light" routerLink="/tabs/dashboard">
+          <ion-icon name="arrow-back-outline"></ion-icon>
+        </ion-button>
+        <h1>Profile</h1>
+        <div style="width: 40px;"></div>
+      </div>
+    </div>
+
+    <!-- LOADING -->
+    <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+
+    <!-- PROFILE SECTION -->
+    <div class="profile-section" *ngIf="!loading">
+
+      <!-- AVATAR -->
+      <div class="avatar-container">
+        <ion-avatar class="profile-avatar" *ngIf="avatarUrl; else noAvatar">
+          <img [src]="avatarUrl" alt="avatar" />
+        </ion-avatar>
+        <ng-template #noAvatar>
+          <div class="profile-avatar placeholder">
+            {{ fullName.charAt(0).toUpperCase() }}
+          </div>
+        </ng-template>
+      </div>
+
+      <!-- USER INFO -->
+      <div class="user-info">
+        <h2>{{ fullName }}</h2>
+        <p class="email">{{ email }}</p>
+        <ion-badge [color]="role === 'PAIR' ? 'primary' : 'success'">
+          {{ role }}
+        </ion-badge>
+      </div>
+
+    </div>
+
+    <!-- INFO CARDS -->
+    <div class="info-cards" *ngIf="!loading">
+
+      <!-- USER ID -->
+      <div class="info-card">
+        <div class="card-label">User ID</div>
+        <div class="card-value">{{ userId }}</div>
+      </div>
+
+      <!-- EMAIL -->
+      <div class="info-card">
+        <div class="card-label">Email</div>
+        <div class="card-value">{{ email }}</div>
+      </div>
+
+      <!-- ROLE -->
+      <div class="info-card">
+        <div class="card-label">Role</div>
+        <div class="card-value">
+          <span *ngIf="role === 'PAIR'" class="role-badge pair">PAIR Staff</span>
+          <span *ngIf="role === 'ORG' || role === 'ORGANIZATION'" class="role-badge org">Organization</span>
+          <span *ngIf="role === 'ADMIN'" class="role-badge admin">Administrator</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="actions" *ngIf="!loading">
+
+      <!-- CHANGE PASSWORD BUTTON -->
+      <ion-button expand="block" color="primary" (click)="changePassword()" class="action-btn">
+        <ion-icon name="key-outline" slot="start"></ion-icon>
+        Change Password
+      </ion-button>
+
+      <!-- LOGOUT BUTTON -->
+      <ion-button expand="block" color="danger" (click)="logout()" class="action-btn">
+        <ion-icon name="log-out-outline" slot="start"></ion-icon>
+        Logout
+      </ion-button>
+
+    </div>
+
+  </div>
+
+</ion-content>

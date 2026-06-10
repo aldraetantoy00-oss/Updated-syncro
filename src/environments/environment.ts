@@ -10,5 +10,8 @@ export const environment = {
   },
   
   openaiApiKey: "YOUR_OPENAI_API_KEY"
+  ,
+  // OPTIONAL: URL to server-side login verifier (Firebase function or similar)
+  verifyLoginUrl: ''
 
 };

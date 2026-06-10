@@ -54,9 +54,11 @@
           expand="block"
           class="login-btn"
           (click)="login()"
+          type="button"
+          [disabled]="isLoggingIn"
         >
 
-          SIGN IN
+          {{ isLoggingIn ? 'SIGNING IN...' : 'SIGN IN' }}
 
         </ion-button>
 

@@ -4,10 +4,10 @@
   <div class="header">
 
     <div>
-      <h2>Enhance Caption</h2>
+      <h2>Review Submission</h2>
 
       <p>
-        Choose AI-assisted or manual enhancement
+        Review and provide feedback on the submission
       </p>
     </div>
 
@@ -23,7 +23,7 @@
     <!-- ORIGINAL CAPTION -->
     <div class="card">
 
-      <label>Original Caption</label>
+      <label>📝 Original Caption</label>
 
       <ion-textarea
         [value]="post.original_caption"
@@ -33,10 +33,10 @@
 
     </div>
 
-    <!-- AI PROVIDER -->
-    <div class="card">
+    <!-- AI PROVIDER (PAIR ONLY) -->
+    <div class="card" *ngIf="allowPairActions">
 
-      <label>AI Provider</label>
+      <label>🤖 AI Provider</label>
 
       <div class="chips">
 
@@ -65,10 +65,10 @@
 
     </div>
 
-    <!-- TONE -->
-    <div class="card">
+    <!-- TONE (PAIR ONLY) -->
+    <div class="card" *ngIf="allowPairActions">
 
-      <label>Tone</label>
+      <label>✨ Tone</label>
 
       <ion-select [(ngModel)]="tone">
 
@@ -84,19 +84,22 @@
 
     </div>
 
-    <!-- GENERATE -->
+    <!-- GENERATE (PAIR ONLY) -->
     <ion-button
+      *ngIf="allowPairActions"
       expand="block"
-      color="success"
+      color="secondary"
       (click)="generateAI()"
+      class="generate-btn"
     >
+      <ion-icon name="sparkles-outline" slot="start"></ion-icon>
       Generate with AI
     </ion-button>
 
     <!-- ENHANCED TEXT -->
-    <div class="card">
+    <div class="card" *ngIf="allowPairActions">
 
-      <label>Enhanced Caption</label>
+      <label>✍️ Enhanced Caption</label>
 
       <ion-textarea
         [(ngModel)]="enhancedText"
@@ -110,34 +113,87 @@
 
     </div>
 
-    <!-- COMMENTS -->
+    <!-- DECISION (PAIR ONLY) -->
+    <div class="card" *ngIf="allowPairActions && !showPostedOption">
+
+      <label>📋 Decision</label>
+
+      <div class="decision-chips">
+
+        <button
+          [class.active]="decision==='approve'"
+          (click)="decision='approve'"
+          class="approve-chip"
+        >
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+          Approve
+        </button>
+
+        <button
+          [class.active]="decision==='reject'"
+          (click)="decision='reject'"
+          class="reject-chip"
+        >
+          <ion-icon name="close-circle-outline"></ion-icon>
+          Reject
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- POSTED OPTION (PAIR ONLY - For already approved submissions) -->
+    <div class="card" *ngIf="allowPairActions && showPostedOption">
+
+      <label>📤 Publish</label>
+
+      <p class="info-text">This submission has been approved. Mark it as posted to publish it.</p>
+
+      <ion-button expand="block" color="success" (click)="decision='posted'" [class.active]="decision==='posted'" class="posted-btn">
+        <ion-icon name="cloud-upload-outline"></ion-icon>
+        Mark as Posted
+      </ion-button>
+
+    </div>
+
+    <!-- FEEDBACK -->
     <div class="card">
 
-      <label>Your Comments (Optional)</label>
+      <label>💬 Feedback for Organization</label>
 
       <ion-textarea
-        [(ngModel)]="comments"
+        [(ngModel)]="feedback"
         auto-grow="true"
-        placeholder="Add internal notes or feedback..."
+        placeholder="Provide constructive feedback or notes..."
+        [readonly]="!allowPairActions"
       ></ion-textarea>
+
+      <small *ngIf="allowPairActions">
+        Your feedback will be sent to the organization
+      </small>
 
     </div>
 
     <!-- ACTIONS -->
-    <div class="actions">
+    <div class="actions" *ngIf="allowPairActions">
 
       <ion-button
         fill="outline"
         (click)="close()"
+        [disabled]="isSubmitting"
       >
+        <ion-icon name="close-outline" slot="start"></ion-icon>
         Cancel
       </ion-button>
 
       <ion-button
-        color="success"
-        (click)="preview()"
+        [color]="decision === 'approve' ? 'success' : 'danger'"
+        (click)="submitReview()"
+        [disabled]="isSubmitting"
+        class="submit-review-btn"
       >
-        Preview & Approve
+        <ion-icon [name]="decision === 'approve' ? 'checkmark-outline' : 'close-outline'" slot="start"></ion-icon>
+        {{ isSubmitting ? 'Submitting...' : (decision === 'approve' ? 'Approve' : 'Reject') }}
       </ion-button>
 
     </div>

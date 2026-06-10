@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
 import { SupabaseService } from '../../services/supabase';
+import { AuthRoleService } from '../../services/auth-role.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -13,21 +15,32 @@ export class LoginPage {
 
   email = '';
   password = '';
+  isLoggingIn = false;
 
   constructor(
     private router: Router,
     private loadingCtrl: LoadingController,
-    private supabaseService: SupabaseService
+    private supabaseService: SupabaseService,
+    private authRole: AuthRoleService
   ) {}
 
   // LOGIN
   async login() {
 
+    if (this.isLoggingIn) return;
+    this.isLoggingIn = true;
+
+    // ensure we don't allow rapid double-clicks (secondary guard)
+    const startTs = Date.now();
+
+    // Trim and normalize inputs
+    const email = (this.email || '').trim().toLowerCase();
+    const password = (this.password || '').trim();
+
     // VALIDATION
-    if (!this.email || !this.password) {
-
+    if (!email || !password) {
       alert('Please enter email and password');
-
+      this.isLoggingIn = false;
       return;
     }
 
@@ -39,39 +52,87 @@ export class LoginPage {
     await loading.present();
 
     try {
+      console.log('Login started for', email);
 
-      // SUPABASE LOGIN
-      const { data, error } =
-        await this.supabaseService.supabase.auth.signInWithPassword({
+      // Use users-table login (serialized, bcrypt verification in service)
+      try {
+        const result: any = await this.supabaseService.loginWithUsersTable(email, password);
+        if (result?.error) {
+          console.warn('Login failed:', result.error);
+          alert((result.error && result.error.message) ? result.error.message : 'Invalid credentials');
+          try { await loading.dismiss(); } catch (e) {}
+          this.isLoggingIn = false;
+          return;
+        }
 
-          email: this.email,
+        const session = result?.session ?? null;
+        if (session) {
+          try { this.authRole.setRole((session as any).role || null); } catch (e) {}
+          try { await loading.dismiss(); } catch (e) {}
+          this.isLoggingIn = false;
+          if ((session as any).role && ((session as any).role).toUpperCase() === 'PAIR') {
+            await this.router.navigateByUrl('/pair-tabs/dashboard', { replaceUrl: true });
+          } else {
+            await this.router.navigateByUrl('/tabs/dashboard', { replaceUrl: true });
+          }
+          return;
+        }
 
-          password: this.password
-
-        });
-
-      loading.dismiss();
-
-      console .log('SUPABASE LOGIN DATA:', data);
-      console.log('SUPABASE LOGIN ERROR:', error);
-
-      if (error) {
-
-        alert(error.message);
-
-      } else {
-
-      this.router.navigateByUrl('/tabs/dashboard');
+        alert('Invalid credentials');
+        try { await loading.dismiss(); } catch (e) {}
+        this.isLoggingIn = false;
+        return;
+      } catch (err: any) {
+        console.error('LOGIN ERROR (users-table):', err);
+        alert(err?.message || 'Login failed. Please try again.');
+        try { await loading.dismiss(); } catch (e) {}
+        this.isLoggingIn = false;
+        return;
       }
 
     } catch (err) {
-
-      loading.dismiss();
-
-      console.error('LOGIN ERROR:', err);
-
+      console.error('LOGIN ERROR (outer):', err);
       alert('An error occurred during login. Please try again.');
+    } finally {
+      try {
+        await loading.dismiss();
+      } catch (e) {
+        // ignore dismiss errors
+      }
+      // ensure loading state cleared (other paths also clear it)
+      this.isLoggingIn = false;
+    }
+  }
 
+  // Navigate based on user role
+  private async navigateBasedOnRole() {
+    try {
+      // Prefer cached role to avoid extra lookups
+      const cached = this.authRole.getCachedRole();
+      if (cached) {
+        if (cached === 'PAIR' || cached === 'PAIR_STAFF') {
+          console.log('👮 PAIR user detected (cached), navigating to PAIR tabs');
+          this.router.navigateByUrl('/pair-tabs/dashboard', { replaceUrl: true });
+          return;
+        } else {
+          console.log('🏢 Organization user detected (cached), navigating to organization tabs');
+          this.router.navigateByUrl('/tabs/dashboard', { replaceUrl: true });
+          return;
+        }
+      }
+
+      // Fallback: perform role check which will query if needed
+      const isPair = await this.authRole.isPair();
+      if (isPair) {
+        console.log('👮 PAIR user detected, navigating to PAIR tabs');
+        this.router.navigateByUrl('/pair-tabs/dashboard', { replaceUrl: true });
+      } else {
+        console.log('🏢 Organization user detected, navigating to organization tabs');
+        this.router.navigateByUrl('/tabs/dashboard', { replaceUrl: true });
+      }
+    } catch (e) {
+      console.error('Error determining user role, defaulting to organization dashboard:', e);
+      this.router.navigateByUrl('/tabs/dashboard', { replaceUrl: true });
     }
   }
 }

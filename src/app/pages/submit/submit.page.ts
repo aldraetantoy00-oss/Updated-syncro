@@ -21,6 +21,7 @@ export class SubmitPage {
   images: File[] = [];
 
   imagePreviews: string[] = [];
+  isSubmitting = false;
 
   constructor(
     private navCtrl: NavController,
@@ -64,13 +65,10 @@ export class SubmitPage {
 
   async submit() {
 
-    const loading =
-      await this.loadingCtrl.create({
+    if (this.isSubmitting) return;
+    this.isSubmitting = true;
 
-        message: 'Submitting...'
-
-      });
-
+    const loading = await this.loadingCtrl.create({ message: 'Submitting...' });
     await loading.present();
 
     try {
@@ -82,33 +80,43 @@ export class SubmitPage {
 
         );
 
+      // Get numeric application profile id (if available). If not, omit user_id to avoid type mismatch.
+      const appUserId = await this.supabaseService.getAppUserId();
+      const authUser = await this.supabaseService.getUser();
+
       // INSERT SUBMISSION
-      const { data, error } =
-        await this.supabaseService.supabase
-          .from('submissions')
-          .insert([
-            {
+      // build payload and only include numeric user_id when available (prevents bigint errors)
+      const payload: any = {
+        original_caption: this.content,
+        links: cleanLinks,
+        media_paths: this.imagePreviews,
+        status: 'pending',
+        workflow_status: 'submitted'
+      };
+      if (appUserId !== null) payload.user_id = appUserId;
 
-              user_id: 3,
+      let data: any = null;
+      let error: any = null;
 
-              original_caption:
-                this.content,
+      const userId = authUser && authUser.id ? Number(authUser.id) : null;
 
-              links: cleanLinks,
 
-              media_paths:
-                this.imagePreviews,
+      try {
+        // ensure payload uses numeric user id when available
+        if (userId !== null && !Number.isNaN(userId)) payload.user_id = userId;
+        const res = await this.supabaseService.supabase.from('submissions').insert([payload]);
+        data = (res as any).data;
+        error = (res as any).error;
+        console.log('DEBUG: submission insert ->', { data, error });
+      } catch (e: any) {
+        console.error('Submission insert threw:', e);
+        // surface as error to outer catch
+        throw e;
+      }
 
-              status: 'pending',
-
-              workflow_status:
-                'submitted'
-
-            }
-          ]);
-
-      console.log(data);
-      console.log(error);
+      if (data === null && error === null) {
+        console.warn('Ambiguous submission response: both data and error are null.');
+      }
 
       // ERROR
       if (error) {
@@ -118,50 +126,32 @@ export class SubmitPage {
       }
 
       // INSERT NOTIFICATION
-      const {
-        data: notifData,
-        error: notifError
-      } =
-       await this.supabaseService.supabase
-  .from('notifications')
-  .insert([
-    {
-
-      id: crypto.randomUUID(),
-
-      type:
-        'App\\Notifications\\SubmissionQueuedForReview',
-
-      notifiable_type:
-        'App\\Models\\User',
-
-      notifiable_id: 1,
-
-      data: JSON.stringify({
-
-        title:
-          'New submission to review',
-
-        message:
-          'A new submission was added.'
-
-      }),
-
-      created_at: new Date(),
-
-      updated_at: new Date()
-
-    }
-  ]);
-      console.log(
-        'NOTIF DATA:',
-        notifData
-      );
-
-      console.log(
-        'NOTIF ERROR:',
-        notifError
-      );
+        try {
+          const res2 = await this.supabaseService.supabase.from('notifications').insert([
+            {
+              id: crypto.randomUUID(),
+              type: 'App\\Notifications\\SubmissionQueuedForReview',
+              notifiable_type: 'App\\Models\\User',
+              ...(appUserId !== null ? { notifiable_id: appUserId } : {}),
+              data: JSON.stringify({ title: 'New submission to review', message: 'A new submission was added.' }),
+              created_at: new Date(),
+              updated_at: new Date()
+            }
+          ]);
+          const notifData = (res2 as any).data;
+          const notifError = (res2 as any).error;
+          console.log('DEBUG: notification insert ->', { notifData, notifError });
+          if (notifError) {
+            console.error('Notification error details:', {
+              status: notifError?.status,
+              message: notifError?.message,
+              details: notifError?.details,
+              hint: notifError?.hint
+            });
+          }
+        } catch (e: any) {
+          console.error('Notification insert threw:', e);
+        }
 
       await loading.dismiss();
 
@@ -174,23 +164,20 @@ export class SubmitPage {
 
       this.imagePreviews = [];
 
-      alert(
-        'Submission successful'
-      );
+      alert('Submission successful');
 
       // REDIRECT
-      this.navCtrl.navigateRoot(
-        '/tabs/dashboard'
-      );
+      this.navCtrl.navigateRoot('/tabs/dashboard');
 
     } catch (err) {
 
       await loading.dismiss();
-
       console.error(err);
-
       alert('Submit failed');
 
+    }
+    finally {
+      this.isSubmitting = false;
     }
   }
 }

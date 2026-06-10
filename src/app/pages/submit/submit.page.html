@@ -68,8 +68,8 @@
     </div>
 
     <!-- SUBMIT BUTTON -->
-    <ion-button expand="block" color="success" (click)="submit()" class="submit-btn">
-      Submit for Review
+    <ion-button expand="block" color="success" (click)="submit()" class="submit-btn" [disabled]="isSubmitting">
+      {{ isSubmitting ? 'Submitting...' : 'Submit for Review' }}
     </ion-button>
 
   </div>
