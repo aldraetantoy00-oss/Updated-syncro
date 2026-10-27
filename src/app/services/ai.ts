@@ -1,38 +1,25 @@
 import { Injectable } from '@angular/core';
-import OpenAI from 'openai';
-import { environment } from 'src/environments/environment';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AiService {
 
-  private openai = new OpenAI({
-    apiKey: environment.openaiApiKey,
-    dangerouslyAllowBrowser: true
-  });
-
-  constructor() {}
-
   async generateCaption(prompt: string): Promise<string> {
     try {
-      const response = await this.openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'user',
-            content: `
-Create a short Instagram caption.
-Include emojis.
-Add 3 hashtags.
-
-Topic: ${prompt}
-`
-          }
-        ],
+      const response = await fetch(`${environment.supabaseFunctionsUrl}/account-service`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: environment.supabaseAnonKey,
+          Authorization: `Bearer ${environment.supabaseAnonKey}`
+        },
+        body: JSON.stringify({ action: 'generateCaption', text: prompt })
       });
-
-      return response.choices[0].message.content || '';
+      if (!response.ok) throw new Error('Caption generation failed');
+      const result = await response.json();
+      return result.caption || '';
     } catch (error) {
       console.error('AI Error:', error);
       return 'Failed to generate caption';

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
 import { SupabaseService } from '../../services/supabase';
@@ -11,11 +11,12 @@ import { environment } from '../../../environments/environment';
   styleUrls: ['./login.page.scss'],
   standalone: false,
 })
-export class LoginPage {
+export class LoginPage implements OnInit {
 
   email = '';
   password = '';
   isLoggingIn = false;
+  accountRequestSubmitted = false;
 
   constructor(
     private router: Router,
@@ -23,6 +24,13 @@ export class LoginPage {
     private supabaseService: SupabaseService,
     private authRole: AuthRoleService
   ) {}
+
+  ngOnInit() {
+    try {
+      this.accountRequestSubmitted = localStorage.getItem('accountRequestSubmitted') === 'true';
+      localStorage.removeItem('accountRequestSubmitted');
+    } catch (e) {}
+  }
 
   // LOGIN
   async login() {
@@ -35,7 +43,7 @@ export class LoginPage {
 
     // Trim and normalize inputs
     const email = (this.email || '').trim().toLowerCase();
-    const password = (this.password || '').trim();
+    const password = this.password || '';
 
     // VALIDATION
     if (!email || !password) {
@@ -70,7 +78,7 @@ export class LoginPage {
           try { this.authRole.setRole((session as any).role || null); } catch (e) {}
           try { await loading.dismiss(); } catch (e) {}
           this.isLoggingIn = false;
-          if ((session as any).role && ((session as any).role).toUpperCase() === 'PAIR') {
+          if (await this.authRole.isPair()) {
             await this.router.navigateByUrl('/pair-tabs/dashboard', { replaceUrl: true });
           } else {
             await this.router.navigateByUrl('/tabs/dashboard', { replaceUrl: true });

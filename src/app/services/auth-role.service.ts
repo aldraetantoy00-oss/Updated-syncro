@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { SupabaseService } from './supabase';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthRoleService {
@@ -8,6 +9,13 @@ export class AuthRoleService {
   constructor(private supabase: SupabaseService) {}
 
   async loadRole() {
+    if (!environment.production && typeof localStorage !== 'undefined') {
+      const debugRole = localStorage.getItem('debugRole');
+      if (debugRole) {
+        this._role = debugRole.trim().toUpperCase();
+        return this._role;
+      }
+    }
     if (this._role) return this._role;
     // Try to read role from auth user (localStorage or Supabase session) to avoid extra DB queries
     try {
@@ -31,20 +39,17 @@ export class AuthRoleService {
 
   async isAdmin() {
     const r = await this.loadRole();
-    return r === 'ADMIN';
+    return r === 'ADMIN' || r === 'SUPER_ADMIN';
   }
 
   async isPair() {
     const r = await this.loadRole();
-    return r === 'PAIR' || r === 'PAIR_STAFF' || r === 'PAIR_STAFF'.toUpperCase();
+    return r === 'PAIR' || r === 'PAIR_STAFF';
   }
 
   async isCreator() {
     const r = await this.loadRole();
-    // Treat unknown role as creator for mobile
-    if (!r) return true;
-    // Accept common variants for organization role
-    return (r === 'CREATOR' || r === 'ORGANIZATION' || r === 'DEPARTMENT' || r === 'ORG');
+    return r === 'CREATOR' || r === 'ORGANIZATION' || r === 'DEPARTMENT' || r === 'ORG';
   }
 
   async canPerformPairActions() {

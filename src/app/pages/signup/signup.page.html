@@ -7,21 +7,45 @@
 
       <h1>Syncro</h1>
 
-      <p>Create your account</p>
+      <p>Request an account</p>
+
+      <p>Your request will be reviewed by an administrator before you can sign in.</p>
 
     </div>
 
-    <!-- USERNAME -->
     <div class="input-group">
+      <label>Your name</label>
+      <ion-input
+        [(ngModel)]="name"
+        autocomplete="name"
+        placeholder="Your full name"
+      ></ion-input>
+    </div>
 
-      <label>Username</label>
-
+    <div class="input-group">
+      <label>Login username</label>
       <ion-input
         [(ngModel)]="username"
+        autocomplete="username"
         placeholder="Choose a username"
       ></ion-input>
-
     </div>
+
+    <div class="input-group">
+      <label>School / Department</label>
+      <ion-select
+        [(ngModel)]="departmentId"
+        placeholder="Select your school or department"
+        interface="popover"
+      >
+        <ion-select-option *ngFor="let department of departments" [value]="department.id">
+          {{ department.name }}
+        </ion-select-option>
+      </ion-select>
+      <small *ngIf="departmentsError">{{ departmentsError }}</small>
+    </div>
+
+    <div class="form-error" *ngIf="formError" role="alert">{{ formError }}</div>
 
     <!-- EMAIL -->
     <div class="input-group">
@@ -31,6 +55,7 @@
       <ion-input
         [(ngModel)]="email"
         type="email"
+        autocomplete="email"
         placeholder="you@example.com"
       ></ion-input>
 
@@ -44,8 +69,12 @@
       <ion-input
         [(ngModel)]="password"
         type="password"
-        placeholder="Enter password"
+        placeholder="Enter a strong password"
+        (ionFocus)="showPasswordRequirements = true"
+        (ionBlur)="showPasswordRequirements = false"
       ></ion-input>
+      <small class="password-requirements" [class.show]="showPasswordRequirements">At least 6 characters</small>
+      <small class="field-error" *ngIf="passwordError">{{ passwordError }}</small>
 
     </div>
 
@@ -57,8 +86,9 @@
       <ion-input
         [(ngModel)]="confirmPassword"
         type="password"
-        placeholder="Confirm password"
+        placeholder="Confirm your password"
       ></ion-input>
+      <small class="field-error" *ngIf="confirmPasswordError">{{ confirmPasswordError }}</small>
 
     </div>
 
@@ -67,9 +97,10 @@
       expand="block"
       class="signup-btn"
       (click)="register()"
+      [disabled]="isSubmitting || departments.length === 0"
     >
 
-      Create Account
+      {{ isSubmitting ? 'Submitting request...' : 'Request account' }}
 
     </ion-button>
 

@@ -41,7 +41,13 @@ ion-content {
   font-size: 18px;
 }
 
-.header h1 { display: none; }
+.header h1 {
+  display: block;
+  margin: 4px 12px 0;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+}
 
 .header h2 {
   font-size: 20px;

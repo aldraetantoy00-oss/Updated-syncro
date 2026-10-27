@@ -1,0 +1,54 @@
+.requests-page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 20px 16px 36px;
+}
+
+.intro {
+  margin: 0 0 18px;
+  color: var(--ion-color-medium-shade);
+}
+
+.request {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--ion-color-light-shade);
+}
+
+.request-info h2 {
+  margin: 0 0 6px;
+  font-size: 17px;
+}
+
+.request-info p,
+.request-info time {
+  display: block;
+  margin: 4px 0;
+  color: var(--ion-color-medium-shade);
+  overflow-wrap: anywhere;
+}
+
+.state {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 100px;
+  color: var(--ion-color-medium-shade);
+}
+
+.error {
+  color: var(--ion-color-danger);
+}
+
+@media (max-width: 480px) {
+  .request {
+    align-items: flex-start;
+  }
+
+  .request ion-button {
+    flex-shrink: 0;
+  }
+}

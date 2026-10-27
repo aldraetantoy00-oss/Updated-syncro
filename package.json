@@ -9,8 +9,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint"
-    ,
+    "lint": "ng lint",
     "inspect-passwords": "node scripts/inspect_fix_passwords.js",
     "inspect-passwords:fix": "node scripts/inspect_fix_passwords.js --fix"
   },
@@ -20,7 +19,6 @@
     "@angular/common": "^20.0.0",
     "@angular/compiler": "^20.0.0",
     "@angular/core": "^20.0.0",
-    "@angular/fire": "^20.0.1",
     "@angular/forms": "^20.0.0",
     "@angular/platform-browser": "^20.0.0",
     "@angular/platform-browser-dynamic": "^20.0.0",
@@ -32,10 +30,7 @@
     "@capacitor/status-bar": "8.0.2",
     "@ionic/angular": "^8.0.0",
     "@supabase/supabase-js": "^2.106.0",
-    "bcryptjs": "^3.0.3",
-    "firebase": "^11.10.0",
     "ionicons": "^7.0.0",
-    "openai": "^6.34.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"

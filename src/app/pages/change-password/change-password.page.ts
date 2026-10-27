@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AlertController, LoadingController } from '@ionic/angular';
 import { SupabaseService } from '../../services/supabase';
+import { AuthRoleService } from '../../services/auth-role.service';
 
 @Component({
   selector: 'app-change-password',
@@ -9,7 +10,7 @@ import { SupabaseService } from '../../services/supabase';
   styleUrls: ['./change-password.page.scss'],
   standalone: false,
 })
-export class ChangePasswordPage {
+export class ChangePasswordPage implements OnInit {
 
   currentPassword = '';
   newPassword = '';
@@ -19,13 +20,30 @@ export class ChangePasswordPage {
   showCurrentPassword = false;
   showNewPassword = false;
   showConfirmPassword = false;
+  backUrl = '/tabs/dashboard';
+  returnUrl = '/tabs/profile';
+  notificationsUrl = '/tabs/notifications';
 
   constructor(
     private supabaseService: SupabaseService,
+    private authRole: AuthRoleService,
+    private route: ActivatedRoute,
     private router: Router,
     private alertCtrl: AlertController,
     private loadingCtrl: LoadingController
   ) {}
+
+  async ngOnInit() {
+    const requestedReturnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+    if (requestedReturnUrl === '/tabs/profile' || requestedReturnUrl === '/pair-tabs/profile') {
+      this.returnUrl = requestedReturnUrl;
+    }
+    if (await this.authRole.canPerformPairActions()) {
+      this.backUrl = '/pair-tabs/dashboard';
+      this.notificationsUrl = '/pair-tabs/notifications';
+      if (this.returnUrl === '/tabs/profile') this.returnUrl = '/pair-tabs/profile';
+    }
+  }
 
   togglePasswordVisibility(field: string) {
     if (field === 'current') {
@@ -49,10 +67,10 @@ export class ChangePasswordPage {
       return;
     }
 
-    if (this.newPassword.length < 6) {
+    if (this.newPassword.length < 8) {
       const alert = await this.alertCtrl.create({
         header: 'Validation Error',
-        message: 'New password must be at least 6 characters long',
+        message: 'New password must be at least 8 characters long',
         buttons: ['OK']
       });
       await alert.present();
@@ -93,40 +111,8 @@ export class ChangePasswordPage {
         throw new Error('User not authenticated');
       }
 
-      // Verify current password via users table auth (local bcrypt check)
-      try {
-        const res: any = await this.supabaseService.loginWithUsersTable(user.email || '', this.currentPassword);
-        if (res?.error || !res?.session) throw new Error('Current password is incorrect');
-      } catch (e) {
-        throw new Error('Current password is incorrect');
-      }
-
-      // Hash and update password in users table
-      let hash = null;
-      try {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        const bcryptModule: any = (await import('bcryptjs'))?.default ?? (await import('bcryptjs'));
-        hash = await bcryptModule.hash(this.newPassword, 10);
-      } catch (e) {
-        console.warn('bcryptjs not available, password won\'t be hashed in database');
-      }
-
-      const updateObj: any = {};
-      if (hash) {
-        updateObj.password = hash;
-      } else {
-        updateObj.password = this.newPassword;
-      }
-
-      const { error: dbError } = await this.supabaseService.supabase
-        .from('users')
-        .update(updateObj)
-        .eq('id', user.id);
-
-      if (dbError) {
-        throw dbError;
-      }
+      const { error } = await this.supabaseService.changePassword(this.currentPassword, this.newPassword);
+      if (error) throw error;
 
       await loading.dismiss();
 
@@ -137,7 +123,7 @@ export class ChangePasswordPage {
           {
             text: 'OK',
             handler: () => {
-              this.router.navigateByUrl('/profile');
+              this.router.navigateByUrl(this.returnUrl);
             }
           }
         ]
@@ -158,6 +144,6 @@ export class ChangePasswordPage {
   }
 
   goBack() {
-    this.router.navigateByUrl('/profile');
+    this.router.navigateByUrl(this.returnUrl);
   }
 }

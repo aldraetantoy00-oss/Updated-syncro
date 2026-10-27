@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModalController } from '@ionic/angular';
 import { SupabaseService } from '../../services/supabase';
@@ -11,14 +11,17 @@ import { AuthRoleService } from '../../services/auth-role.service';
   styleUrls: ['./all-submissions.page.scss'],
   standalone: false,
 })
-export class AllSubmissionsPage implements OnInit {
+export class AllSubmissionsPage {
 
   posts: any[] = [];
   filteredPosts: any[] = [];
+  loading = false;
+  loadError = '';
   filterStatus = '';
   searchQuery = '';
   showFilters = false;
   role: string | null = null;
+  canReview = false;
 
   constructor(
     private supabaseService: SupabaseService,
@@ -27,79 +30,25 @@ export class AllSubmissionsPage implements OnInit {
     public authRole: AuthRoleService
   ) {}
 
-  ngOnInit() {
+  ionViewWillEnter() {
     this.getPosts();
   }
 
   async getPosts() {
     const FILE_ID = 'src/app/pages/all-submissions/all-submissions.page.ts:getPosts';
-    console.log(FILE_ID, 'start');
+    this.loading = true;
+    this.loadError = '';
 
     try {
-      const localUser = await this.supabaseService.getUser().catch(() => null);
-      console.log(FILE_ID, 'localUser:', localUser);
-
       const role = await this.authRole.loadRole().catch(() => null);
-      console.log(FILE_ID, 'role:', role);
       this.role = role;
+      this.canReview = await this.authRole.canPerformPairActions().catch(() => false);
 
-      const appUserId = await this.supabaseService.getAppUserId().catch(() => null);
-      console.log(FILE_ID, 'appUserId:', appUserId);
-
-      const workflowStates = ['submitted', 'pending', 'in_review'];
-      let res: any;
-
-      if (role === 'PAIR') {
-        console.log(FILE_ID, 'role=PAIR — fetching content queue by workflow_status OR status');
-        // Try a combined query checking both workflow_status and status fields
-        try {
-          res = await this.supabaseService.supabase
-            .from('submissions')
-            .select('*')
-            .or(`workflow_status.in.(${workflowStates.join(',')}) , status.in.(${workflowStates.join(',')})`)
-            .order('created_at', { ascending: false })
-            .limit(1000);
-        } catch (e) {
-          console.warn(FILE_ID, 'combined query failed, falling back to workflow_status in()', e);
-          res = await this.supabaseService.supabase
-            .from('submissions')
-            .select('*')
-            .in('workflow_status', workflowStates)
-            .order('created_at', { ascending: false })
-            .limit(1000);
-        }
-
-        // If no rows returned, fall back to a permissive recent submissions query
-        if ((!res || !res.data || res.data.length === 0) && (!res || !res.error)) {
-          console.log(FILE_ID, 'no rows from combined query — running permissive recent-posts fallback');
-          res = await this.supabaseService.supabase
-            .from('submissions')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(1000);
-        }
-
-      } else if (role === 'ORGANIZATION' && appUserId) {
-        console.log(FILE_ID, 'role=ORGANIZATION — fetching submissions for organization user_id', appUserId);
-        res = await this.supabaseService.supabase
-          .from('submissions')
-          .select('*')
-          .eq('user_id', appUserId)
-          .order('created_at', { ascending: false })
-          .limit(1000);
-      } else {
-        console.log(FILE_ID, 'role unknown — running safe recent posts query');
-        res = await this.supabaseService.supabase
-          .from('submissions')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(200);
-      }
-
-      console.log(FILE_ID, 'query result count=', (res.data && res.data.length) || 0, ' error=', res.error);
+      const res = await this.supabaseService.getSubmissions();
 
       if (res.error) {
         console.error(FILE_ID, 'query error', res.error);
+        this.loadError = res.error.message || 'Could not load submissions. Please try again.';
         this.posts = [];
         this.filteredPosts = [];
         this.applyFilters();
@@ -111,14 +60,17 @@ export class AllSubmissionsPage implements OnInit {
       this.applyFilters();
 
       if (!this.posts || this.posts.length === 0) {
-        console.warn(FILE_ID, 'no submissions returned. Verify columns: assigned_to, workflow_status, created_at');
+        console.info(FILE_ID, 'No submissions are available for this account.');
       }
 
     } catch (err) {
       console.error(FILE_ID, 'unexpected error', err);
+      this.loadError = 'Could not load submissions. Please try again.';
       this.posts = [];
       this.filteredPosts = [];
       this.applyFilters();
+    } finally {
+      this.loading = false;
     }
   }
 

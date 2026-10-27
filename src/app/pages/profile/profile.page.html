@@ -1,91 +1,97 @@
-<ion-content [fullscreen]="true">
+<ion-content class="profile-content">
+  <div class="profile-page">
+    <nav class="mobile-app-bar" aria-label="Main navigation">
+      <ion-menu-button aria-label="Open menu">
+        <ion-icon slot="icon-only" name="menu-outline"></ion-icon>
+      </ion-menu-button>
+      <span class="mobile-brand">Syncro</span>
+      <ion-button fill="clear" color="light" [routerLink]="notificationsUrl" aria-label="Notifications">
+        <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
+      </ion-button>
+    </nav>
 
-  <div class="page">
-
-    <!-- HEADER -->
-    <div class="header">
-      <div class="top">
-        <ion-button fill="clear" color="light" routerLink="/tabs/dashboard">
-          <ion-icon name="arrow-back-outline"></ion-icon>
-        </ion-button>
-        <h1>Profile</h1>
-        <div style="width: 40px;"></div>
+    <header class="page-heading">
+      <ion-menu-button aria-label="Open menu">
+        <ion-icon slot="icon-only" name="menu-outline"></ion-icon>
+      </ion-menu-button>
+      <ion-button fill="clear" color="dark" [routerLink]="backUrl" aria-label="Back to dashboard">
+        <ion-icon name="arrow-back-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+      <div>
+        <h1>My profile</h1>
+        <p>Manage your personal details and sign-in credentials</p>
       </div>
+    </header>
+
+    <div class="loading-state" *ngIf="loading">
+      <ion-spinner name="crescent"></ion-spinner>
     </div>
 
-    <!-- LOADING -->
-    <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
-
-    <!-- PROFILE SECTION -->
-    <div class="profile-section" *ngIf="!loading">
-
-      <!-- AVATAR -->
-      <div class="avatar-container">
-        <ion-avatar class="profile-avatar" *ngIf="avatarUrl; else noAvatar">
-          <img [src]="avatarUrl" alt="avatar" />
-        </ion-avatar>
-        <ng-template #noAvatar>
-          <div class="profile-avatar placeholder">
-            {{ fullName.charAt(0).toUpperCase() }}
-          </div>
-        </ng-template>
-      </div>
-
-      <!-- USER INFO -->
-      <div class="user-info">
-        <h2>{{ fullName }}</h2>
-        <p class="email">{{ email }}</p>
-        <ion-badge [color]="role === 'PAIR' ? 'primary' : 'success'">
-          {{ role }}
-        </ion-badge>
-      </div>
-
-    </div>
-
-    <!-- INFO CARDS -->
-    <div class="info-cards" *ngIf="!loading">
-
-      <!-- USER ID -->
-      <div class="info-card">
-        <div class="card-label">User ID</div>
-        <div class="card-value">{{ userId }}</div>
-      </div>
-
-      <!-- EMAIL -->
-      <div class="info-card">
-        <div class="card-label">Email</div>
-        <div class="card-value">{{ email }}</div>
-      </div>
-
-      <!-- ROLE -->
-      <div class="info-card">
-        <div class="card-label">Role</div>
-        <div class="card-value">
-          <span *ngIf="role === 'PAIR'" class="role-badge pair">PAIR Staff</span>
-          <span *ngIf="role === 'ORG' || role === 'ORGANIZATION'" class="role-badge org">Organization</span>
-          <span *ngIf="role === 'ADMIN'" class="role-badge admin">Administrator</span>
+    <main class="profile-layout" *ngIf="!loading">
+      <aside class="profile-summary">
+        <div class="avatar-wrap">
+          <ion-avatar class="profile-avatar" *ngIf="avatarPreview || avatarUrl; else noAvatar">
+            <img [src]="avatarPreview || avatarUrl" alt="Profile photo" />
+          </ion-avatar>
+          <ng-template #noAvatar>
+            <div class="profile-avatar placeholder">{{ (fullName.charAt(0) || 'S').toUpperCase() }}</div>
+          </ng-template>
         </div>
-      </div>
 
-    </div>
+        <h2>{{ fullName }}</h2>
+        <p class="summary-role">{{ role }}</p>
 
-    <!-- ACTIONS -->
-    <div class="actions" *ngIf="!loading">
+        <div class="summary-details">
+          <div><span>Username</span><strong>{{ username }}</strong></div>
+          <div><span>School / department</span><strong>{{ departmentName || '—' }}</strong></div>
+        </div>
 
-      <!-- CHANGE PASSWORD BUTTON -->
-      <ion-button expand="block" color="primary" (click)="changePassword()" class="action-btn">
-        <ion-icon name="key-outline" slot="start"></ion-icon>
-        Change Password
-      </ion-button>
+        <label class="photo-picker" for="profile-photo">
+          <ion-icon name="camera-outline"></ion-icon>
+          <span>Change photo</span>
+        </label>
+        <input class="photo-input" id="profile-photo" type="file" accept="image/jpeg,image/png,image/gif,image/webp" (change)="onAvatarSelected($event)" [disabled]="isSaving" />
+        <small class="photo-help">JPG, PNG, GIF, or WebP up to 2 MB</small>
+      </aside>
 
-      <!-- LOGOUT BUTTON -->
-      <ion-button expand="block" color="danger" (click)="logout()" class="action-btn">
-        <ion-icon name="log-out-outline" slot="start"></ion-icon>
-        Logout
-      </ion-button>
+      <section class="profile-editor">
+        <h2>Personal details</h2>
 
-    </div>
+        <div class="field-group">
+          <ion-label>Display name</ion-label>
+          <ion-input [(ngModel)]="fullName" autocomplete="name"></ion-input>
+        </div>
 
+        <div class="profile-fields-row">
+          <div class="field-group">
+            <ion-label>Username</ion-label>
+            <ion-input [(ngModel)]="username" autocomplete="username"></ion-input>
+          </div>
+          <div class="field-group">
+            <ion-label>Email address</ion-label>
+            <ion-input [(ngModel)]="email" type="email" autocomplete="email"></ion-input>
+          </div>
+        </div>
+
+        <p class="save-error" *ngIf="saveError" role="alert">{{ saveError }}</p>
+
+        <div class="editor-actions">
+          <ion-button fill="outline" color="medium" (click)="changePassword()">
+            <ion-icon name="key-outline" slot="start"></ion-icon>
+            Change password
+          </ion-button>
+          <ion-button color="success" (click)="saveProfile()" [disabled]="isSaving">
+            <ion-spinner *ngIf="isSaving" name="crescent" slot="start"></ion-spinner>
+            <ion-icon *ngIf="!isSaving" name="checkmark-outline" slot="start"></ion-icon>
+            {{ isSaving ? 'Saving...' : 'Save changes' }}
+          </ion-button>
+        </div>
+
+        <ion-button class="logout-button" fill="clear" color="danger" (click)="logout()">
+          <ion-icon name="log-out-outline" slot="start"></ion-icon>
+          Log out
+        </ion-button>
+      </section>
+    </main>
   </div>
-
 </ion-content>

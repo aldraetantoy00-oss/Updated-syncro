@@ -12,8 +12,13 @@ const routes: Routes = [
         loadChildren: () => import('../pair-dashboard/pair-dashboard.module').then(m => m.PairDashboardPageModule)
       },
       {
+        path: 'all-submissions',
+        loadChildren: () => import('../pair-all-submissions/pair-all-submissions.module').then(m => m.PairAllSubmissionsPageModule)
+      },
+      {
         path: 'queue',
-        loadChildren: () => import('../all-submissions/all-submissions.module').then(m => m.AllSubmissionsPageModule)
+        redirectTo: 'all-submissions',
+        pathMatch: 'full'
       },
       {
         path: 'notifications',

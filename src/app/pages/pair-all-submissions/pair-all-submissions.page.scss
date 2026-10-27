@@ -1,0 +1,220 @@
+.pair-submissions-content {
+  --background: #f5f7fb;
+}
+
+.page {
+  min-height: 100%;
+  padding-bottom: 20px;
+}
+
+.app-header {
+  height: 50px;
+  padding: 0 8px;
+  background: #16763a;
+  color: #fff;
+
+  .top {
+    display: grid;
+    grid-template-columns: 44px 1fr 44px;
+    align-items: center;
+    height: 100%;
+
+    span {
+      justify-self: center;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    ion-menu-button,
+    ion-button {
+      width: 40px;
+      height: 40px;
+      margin: 0;
+      --color: #fff;
+    }
+  }
+}
+
+.page-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 14px 0 8px;
+
+  h1 {
+    margin: 0;
+    color: #1d2b22;
+    font-size: 22px;
+    font-weight: 800;
+  }
+
+  p {
+    margin: 4px 0 0;
+    color: #6b7280;
+    font-size: 13px;
+  }
+}
+
+.content-area {
+  width: min(100%, 1100px);
+  margin: 0 auto;
+  padding: 8px 16px 24px;
+}
+
+.submission-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 190px;
+  gap: 12px;
+  margin: 10px 0 16px;
+
+  ion-searchbar {
+    padding: 0;
+    --background: #fff;
+    --border-radius: 12px;
+    --box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+  }
+
+  ion-select {
+    min-height: 44px;
+    padding: 0 12px;
+    border: 1px solid #e4e9e5;
+    border-radius: 12px;
+    background: #fff;
+    color: #334139;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+  }
+}
+
+.submission-list {
+  display: grid;
+  gap: 12px;
+}
+
+.submission-card {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.05);
+}
+
+.status-line {
+  flex: 0 0 4px;
+  border-radius: 999px;
+  background: #9ca3af;
+}
+
+.pending-line { background: #eab308; }
+.review-line { background: #3b82f6; }
+.approved-line { background: #16a34a; }
+.rejected-line { background: #ef4444; }
+.posted-line { background: #8b5cf6; }
+
+.submission-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.submission-org {
+  color: #4b5563;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.submission-caption {
+  display: block;
+  margin: 6px 0 9px;
+  color: #111827;
+  font-size: 15px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.submission-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+
+  ion-badge {
+    border-radius: 999px;
+    padding: 5px 10px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  time {
+    color: #6b7280;
+    font-size: 12px;
+  }
+}
+
+.submission-actions {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  ion-button {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 600;
+  }
+}
+
+.review-action {
+  --background: #154d2c;
+  --background-hover: #103d22;
+  --color: #fff;
+  --border-radius: 4px;
+}
+
+.reject-action {
+  --color: #dc3545;
+  --border-color: #dc3545;
+  --border-radius: 4px;
+}
+
+.page-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 150px;
+  padding: 20px;
+  color: #69756e;
+  text-align: center;
+}
+
+.page-state.error {
+  color: var(--ion-color-danger);
+}
+
+@media (max-width: 640px) {
+  .page-title-row h1 {
+    font-size: 19px;
+  }
+
+  .content-area {
+    padding: 6px 12px 20px;
+  }
+
+  .submission-controls {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .submission-card {
+    padding: 14px 12px;
+  }
+
+  .submission-actions {
+    align-self: flex-end;
+    justify-content: flex-end;
+  }
+}

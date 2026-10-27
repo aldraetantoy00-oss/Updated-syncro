@@ -1,0 +1,82 @@
+<ion-content class="pair-submissions-content">
+  <div class="page">
+    <header class="app-header">
+      <div class="top">
+        <ion-menu-button aria-label="Open menu">
+          <ion-icon slot="icon-only" name="menu-outline"></ion-icon>
+        </ion-menu-button>
+        <span>Syncro</span>
+        <ion-button fill="clear" color="light" routerLink="/pair-tabs/notifications" aria-label="Notifications">
+          <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
+        </ion-button>
+      </div>
+    </header>
+
+    <main class="content-area">
+      <div class="page-title-row">
+        <div>
+          <h1>PAIR All Submissions</h1>
+          <p>Review and manage submissions from every organization.</p>
+        </div>
+        <ion-button fill="clear" color="medium" aria-label="Refresh submissions" (click)="loadSubmissions()" [disabled]="loading">
+          <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
+        </ion-button>
+      </div>
+
+      <div class="submission-controls">
+        <ion-searchbar [(ngModel)]="searchQuery" (ionInput)="applyFilters()" placeholder="Search submissions"></ion-searchbar>
+        <ion-select [(ngModel)]="filterStatus" (ionChange)="applyFilters()" interface="popover" aria-label="Filter by status">
+          <ion-select-option value="">All statuses</ion-select-option>
+          <ion-select-option value="pending">Pending</ion-select-option>
+          <ion-select-option value="submitted">Submitted</ion-select-option>
+          <ion-select-option value="in_review">In review</ion-select-option>
+          <ion-select-option value="approved">Approved</ion-select-option>
+          <ion-select-option value="rejected">Rejected</ion-select-option>
+          <ion-select-option value="posted">Posted</ion-select-option>
+        </ion-select>
+      </div>
+
+      <div class="page-state" *ngIf="loading">
+        <ion-spinner name="crescent"></ion-spinner>
+        <span>Loading submissions</span>
+      </div>
+
+      <div class="page-state error" *ngIf="!loading && error" role="alert">{{ error }}</div>
+
+      <div class="page-state" *ngIf="!loading && !error && filteredSubmissions.length === 0">
+        No submissions match these filters.
+      </div>
+
+      <section class="submission-list" *ngIf="!loading && filteredSubmissions.length">
+        <article class="submission-card" *ngFor="let submission of filteredSubmissions">
+          <div class="status-line" [ngClass]="{
+            'pending-line': (submission.status || submission.workflow_status) === 'pending',
+            'review-line': (submission.status || submission.workflow_status) === 'submitted' || (submission.status || submission.workflow_status) === 'in_review',
+            'approved-line': (submission.status || submission.workflow_status) === 'approved' || (submission.status || submission.workflow_status) === 'completed',
+            'rejected-line': (submission.status || submission.workflow_status) === 'rejected',
+            'posted-line': (submission.status || submission.workflow_status) === 'posted'
+          }"></div>
+          <div class="submission-main">
+            <div class="submission-org">{{ submission.org_name || ('Organization #' + submission.user_id) }}</div>
+            <strong class="submission-caption">{{ submission.original_caption || submission.enhanced_caption || 'No caption' }}</strong>
+            <div class="submission-meta">
+              <ion-badge [color]="statusColor(submission)">{{ statusLabel(submission) }}</ion-badge>
+              <time *ngIf="submission.created_at">{{ submission.created_at | date:'mediumDate' }}</time>
+            </div>
+          </div>
+          <div class="submission-actions">
+            <ion-button class="review-action" size="small" (click)="viewDetails(submission)">
+              <ion-icon name="eye-outline" slot="start"></ion-icon>
+              Review
+            </ion-button>
+            <ion-button fill="outline" size="small" (click)="openEnhance(submission)">Evaluate</ion-button>
+            <ion-button class="reject-action" fill="outline" size="small" (click)="reject(submission)">
+              <ion-icon name="close-outline" slot="start"></ion-icon>
+              Reject
+            </ion-button>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+</ion-content>

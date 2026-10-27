@@ -19,6 +19,7 @@ export class SidebarComponent {
 	avatarUrl = '';
 	loading = false;
 	isPair = false;
+	isAdmin = false;
 
 	constructor(
 		private supabaseService: SupabaseService,
@@ -37,19 +38,21 @@ export class SidebarComponent {
 				this.email = '';
 				this.avatarUrl = '';
 				this.isPair = false;
+				this.isAdmin = false;
 				this.loading = false;
 				return;
 			}
 
 			this.email = user.email ?? '';
+			this.isAdmin = await this.authRole.isAdmin().catch(() => false);
 
 			// Detect user role
 			try {
 				const cached = this.authRole.getCachedRole();
 				if (cached) {
-					this.isPair = cached === 'PAIR' || cached === 'PAIR_STAFF';
+					  this.isPair = cached === 'PAIR' || cached === 'PAIR_STAFF' || cached === 'ADMIN' || cached === 'SUPER_ADMIN';
 				} else {
-					this.isPair = await this.authRole.isPair();
+					  this.isPair = await this.authRole.canPerformPairActions();
 				}
 			} catch (e) {
 				this.isPair = false;

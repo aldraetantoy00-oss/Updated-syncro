@@ -1,41 +1,33 @@
-import { Injectable, inject } from '@angular/core';
-import {
-  Firestore,
-  collection,
-  addDoc,
-  collectionData,
-  doc,
-  updateDoc
-} from '@angular/fire/firestore';
+import { Injectable } from '@angular/core';
+import { SupabaseService } from './supabase';
 
 @Injectable({ providedIn: 'root' })
 export class PostService {
 
-  private firestore = inject(Firestore);
+  constructor(private supabaseService: SupabaseService) {}
 
-  // ✅ SAVE POST
   async addPost(data: any) {
-    const refCol = collection(this.firestore, 'posts');
+    const userId = await this.supabaseService.getAppUserId();
+    if (userId === null) return { data: null, error: new Error('User profile is unavailable.') };
 
-    return addDoc(refCol, {
-      content: data.content || '',
-      links: data.links || [],
-      images: data.images || [], // base64 (compressed)
+    return this.supabaseService.supabase.from('submissions').insert({
+      user_id: userId,
+      original_caption: data.original_caption || data.content || '',
+      enhanced_caption: data.enhanced_caption || '',
       status: 'pending',
-      feedback: '',
-      createdAt: new Date()
-    });
+      workflow_status: 'submitted'
+    }).select().single();
   }
 
-  // ✅ GET POSTS
   getPosts() {
-    const refCol = collection(this.firestore, 'posts');
-    return collectionData(refCol, { idField: 'id' });
+    return this.supabaseService.supabase.from('submissions')
+      .select('*')
+      .order('created_at', { ascending: false });
   }
 
-  // ✅ UPDATE POST
-  updatePost(id: string, data: any) {
-    const refDoc = doc(this.firestore, `posts/${id}`);
-    return updateDoc(refDoc, data);
+  updatePost(id: string | number, data: any) {
+    return this.supabaseService.supabase.from('submissions')
+      .update(data)
+      .eq('id', id);
   }
 }

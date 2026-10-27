@@ -3,7 +3,9 @@
   <!-- HEADER -->
   <div class="header">
     <div class="top-bar">
-      <ion-icon name="menu-outline"></ion-icon>
+      <ion-menu-button aria-label="Open menu">
+        <ion-icon slot="icon-only" name="menu-outline"></ion-icon>
+      </ion-menu-button>
       <span>Syncro</span>
       <ion-icon name="notifications-outline"></ion-icon>
     </div>
@@ -23,6 +25,8 @@
       <ion-textarea
         [(ngModel)]="content"
         placeholder="Write your post caption here. Be clear and descriptive..."
+        [maxlength]="maxCaptionLength"
+        [counter]="true"
         auto-grow="true">
       </ion-textarea>
     </div>

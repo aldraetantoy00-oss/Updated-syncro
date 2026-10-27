@@ -32,7 +32,7 @@ export class SubmissionDetailsPage implements OnInit {
 
   async checkRole() {
     try {
-      this.isPair = await this.authRole.isPair();
+      this.isPair = await this.authRole.canPerformPairActions();
     } catch (e) {
       this.isPair = false;
     }

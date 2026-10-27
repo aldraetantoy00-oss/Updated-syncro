@@ -7,7 +7,9 @@
 
       <div class="top-bar">
 
-        <ion-icon name="menu-outline"></ion-icon>
+        <ion-menu-button aria-label="Open menu">
+          <ion-icon slot="icon-only" name="menu-outline"></ion-icon>
+        </ion-menu-button>
 
         <span>Syncro</span>
 
@@ -15,10 +17,12 @@
 
       </div>
 
+      <h1>My Submissions</h1>
+
       </div>
 
       <!-- Filters / Search / Apply moved below header for compact layout -->
-      <div *ngIf="role !== 'ORGANIZATION'" class="controls">
+      <div *ngIf="canReview" class="controls">
         <div class="filters">
 
           <div class="filters-top">
@@ -76,7 +80,7 @@
             <td>{{ post.created_at | date:'MMM d, y' }}</td>
             <td>
               <div class="actions">
-                <ng-container *ngIf="role === 'PAIR'; else orgArrow">
+                <ng-container *ngIf="canReview; else orgArrow">
                   <ion-button size="small" fill="outline" (click)="viewDetails(post)">Review</ion-button>
                   <ion-button size="small" color="tertiary" (click)="openEnhance(post)">Evaluate</ion-button>
                   <ion-button size="small" color="danger" fill="clear" (click)="reject(post)">Reject</ion-button>
@@ -108,7 +112,7 @@
           </div>
 
           <div class="actions-right">
-            <ng-container *ngIf="role === 'PAIR'; else orgCardArrow">
+            <ng-container *ngIf="canReview; else orgCardArrow">
               <ion-button size="small" fill="outline" (click)="openEnhance(post)">Evaluate</ion-button>
               <ion-button size="small" fill="outline" (click)="viewDetails(post)">Review</ion-button>
               <ion-button size="small" fill="outline" (click)="reject(post)">Reject</ion-button>
@@ -123,15 +127,27 @@
       </div>
     </div>
 
-    <!-- EMPTY STATE / DEBUG -->
-    <div *ngIf="filteredPosts?.length === 0" class="empty-state">
+    <div *ngIf="loading" class="empty-state">
+      <div class="empty-card">
+        <h3>Loading submissions...</h3>
+      </div>
+    </div>
+
+    <div *ngIf="loadError && !loading" class="empty-state">
+      <div class="empty-card">
+        <h3>Could not load submissions</h3>
+        <p>{{ loadError }}</p>
+        <ion-button (click)="getPosts()">Try again</ion-button>
+      </div>
+    </div>
+
+    <div *ngIf="!loading && !loadError && filteredPosts.length === 0" class="empty-state">
       <div class="empty-card">
         <h3>No submissions found</h3>
-        <p>Please check filters or try refreshing.</p>
+        <p *ngIf="posts.length > 0">Please check your filters or try refreshing.</p>
+        <p *ngIf="posts.length === 0">No submissions have been submitted from this account yet.</p>
         <div class="debug">
           <ion-button (click)="getPosts()">Refresh</ion-button>
-          <pre style="white-space:pre-wrap">Role: {{ (authRole?.getCachedRole && authRole.getCachedRole()) || 'unknown' }}</pre>
-          <pre style="white-space:pre-wrap">Posts fetched: {{ posts?.length || 0 }}</pre>
         </div>
       </div>
     </div>

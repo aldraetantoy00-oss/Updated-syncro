@@ -14,6 +14,7 @@ import { SupabaseService } from '../../services/supabase';
 })
 export class SubmitPage {
 
+  readonly maxCaptionLength = 1000;
   content = '';
 
   links: string[] = [''];
@@ -66,6 +67,10 @@ export class SubmitPage {
   async submit() {
 
     if (this.isSubmitting) return;
+    if (this.content.length > this.maxCaptionLength) {
+      alert('Caption/description must be 1,000 characters or fewer.');
+      return;
+    }
     this.isSubmitting = true;
 
     const loading = await this.loadingCtrl.create({ message: 'Submitting...' });

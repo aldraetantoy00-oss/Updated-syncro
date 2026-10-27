@@ -9,24 +9,8 @@ import { AppComponent } from './app.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { AppRoutingModule } from './app-routing.module';
 
-// Firebase
-import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { provideAuth, getAuth } from '@angular/fire/auth';
-import { provideFirestore, getFirestore } from '@angular/fire/firestore';
-
 // HTTP
 import { provideHttpClient } from '@angular/common/http';
-
-import { environment } from '../environments/environment';
-
-// Conditionally include Firebase providers when config present
-const firebaseProviders = (environment as any)?.firebase
-  ? [
-      provideFirebaseApp(() => initializeApp((environment as any).firebase)),
-      provideAuth(() => getAuth()),
-      provideFirestore(() => getFirestore()),
-    ]
-  : [];
 
 @NgModule({
   declarations: [AppComponent],
@@ -39,9 +23,6 @@ const firebaseProviders = (environment as any)?.firebase
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    // Firebase providers (conditionally added)
-    ...firebaseProviders,
-
     provideHttpClient()
   ],
   bootstrap: [AppComponent],

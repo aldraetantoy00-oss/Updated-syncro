@@ -34,6 +34,33 @@
   color: #166534;
 }
 
+.input-group small {
+  display: block;
+  margin: 6px 2px 0;
+  color: #6b7280;
+}
+
+.input-group .password-requirements {
+  display: none;
+}
+
+.input-group .password-requirements.show {
+  display: block;
+}
+
+.input-group .field-error,
+.form-error {
+  color: #b42318;
+}
+
+.form-error {
+  margin: -4px 0 16px;
+  padding: 12px 14px;
+  border: 1px solid #f1b5b2;
+  border-radius: 6px;
+  background: #fff1f0;
+}
+
 ion-input {
   background: white;
 

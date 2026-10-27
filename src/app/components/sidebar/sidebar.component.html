@@ -42,7 +42,7 @@
       <ion-label>Notifications</ion-label>
     </ion-item>
 
-    <ion-item routerLink="/profile" routerLinkActive="selected" [routerLinkActiveOptions]="{ exact: true }" menuClose>
+    <ion-item routerLink="/tabs/profile" routerLinkActive="selected" [routerLinkActiveOptions]="{ exact: true }" menuClose>
       <ion-icon slot="start" name="person-circle-outline"></ion-icon>
       <ion-label>Profile</ion-label>
     </ion-item>
@@ -50,14 +50,19 @@
 
   <!-- PAIR MENU -->
   <ion-list *ngIf="isPair">
+    <ion-item *ngIf="isAdmin" routerLink="/admin/account-requests" routerLinkActive="selected" menuClose>
+      <ion-icon slot="start" name="person-add-outline"></ion-icon>
+      <ion-label>Account requests</ion-label>
+    </ion-item>
+
     <ion-item routerLink="/pair-tabs/dashboard" routerLinkActive="selected" [routerLinkActiveOptions]="{ exact: true }" menuClose>
       <ion-icon slot="start" name="home-outline"></ion-icon>
       <ion-label>Dashboard</ion-label>
     </ion-item>
 
-    <ion-item routerLink="/pair-tabs/queue" routerLinkActive="selected" [routerLinkActiveOptions]="{ exact: true }" menuClose>
+    <ion-item routerLink="/pair-tabs/all-submissions" routerLinkActive="selected" [routerLinkActiveOptions]="{ exact: true }" menuClose>
       <ion-icon slot="start" name="list-outline"></ion-icon>
-      <ion-label>Content Queue</ion-label>
+      <ion-label>PAIR All Submissions</ion-label>
     </ion-item>
 
     <ion-item routerLink="/pair-tabs/notifications" routerLinkActive="selected" [routerLinkActiveOptions]="{ exact: true }" menuClose>

@@ -12,6 +12,10 @@
           ⟳ Syncro
         </h1>
 
+        <div class="account-request-notice" *ngIf="accountRequestSubmitted" role="status" aria-live="polite">
+          Your account request was submitted. You can sign in after an administrator approves it.
+        </div>
+
         <!-- EMAIL -->
         <ion-item
           lines="none"
@@ -25,7 +29,9 @@
 
           <ion-input
             [(ngModel)]="email"
-            placeholder="Username"
+            type="text"
+            autocomplete="username"
+            placeholder="Username or email"
           ></ion-input>
 
         </ion-item>

@@ -38,17 +38,17 @@ export class ReviewPage implements OnInit {
     this.modalCtrl.dismiss();
   }
 
-  submit() {
+  async submit() {
     if (this.decision === 'approve') {
-      this.postService.updatePost(this.post.id, {
-        status: 'completed',
-        content: this.post.content, // ✅ save enhanced
-        feedback: ''
+      await this.postService.updatePost(this.post.id, {
+        status: 'approved',
+        enhanced_caption: this.post.enhanced_caption || this.post.content || '',
+        pair_feedback: null
       });
     } else {
-      this.postService.updatePost(this.post.id, {
+      await this.postService.updatePost(this.post.id, {
         status: 'pending',
-        feedback: this.feedback
+        pair_feedback: this.feedback
       });
     }
 

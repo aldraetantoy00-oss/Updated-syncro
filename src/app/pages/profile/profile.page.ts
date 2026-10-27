@@ -13,11 +13,20 @@ import { AuthRoleService } from '../../services/auth-role.service';
 export class ProfilePage implements OnInit {
 
   fullName = '';
+  username = '';
   email = '';
   role = '';
   userId = '';
   avatarUrl = '';
+  avatarPreview = '';
+  avatarFile: File | null = null;
+  departmentName = '';
+  backUrl = '/tabs/dashboard';
+  profileUrl = '/tabs/profile';
+  notificationsUrl = '/tabs/notifications';
   loading = false;
+  isSaving = false;
+  saveError = '';
 
   constructor(
     private supabaseService: SupabaseService,
@@ -42,14 +51,26 @@ export class ProfilePage implements OnInit {
 
       this.userId = user.id || '';
       this.email = user.email || '';
+      this.username = user.username || user.name || '';
 
       // Get profile information
       const profile = await this.supabaseService.getCurrentUserProfile();
       if (profile) {
-        this.fullName = profile.full_name || profile.name || this.email.split('@')[0];
+        this.fullName = profile.full_name || user.profile_name || user.name || this.email.split('@')[0];
         this.avatarUrl = profile.avatar_url || '';
       } else {
-        this.fullName = this.email.split('@')[0];
+        this.fullName = user.profile_name || user.name || this.email.split('@')[0];
+        this.avatarUrl = user.avatar_url || user.profile_photo_path || '';
+      }
+
+      const departmentId = user.department_id || profile?.department_id;
+      if (departmentId) {
+        const { data: department } = await this.supabaseService.supabase
+          .from('departments')
+          .select('department_name')
+          .eq('id', departmentId)
+          .maybeSingle();
+        this.departmentName = department?.department_name || '';
       }
 
       // Determine role
@@ -58,6 +79,11 @@ export class ProfilePage implements OnInit {
         this.role = userRole.toUpperCase();
       } else {
         this.role = 'ORGANIZATION';
+      }
+      if (await this.authRole.canPerformPairActions()) {
+        this.backUrl = '/pair-tabs/dashboard';
+        this.profileUrl = '/pair-tabs/profile';
+        this.notificationsUrl = '/pair-tabs/notifications';
       }
 
       this.loading = false;
@@ -70,6 +96,80 @@ export class ProfilePage implements OnInit {
         buttons: ['OK']
       });
       await alert.present();
+    }
+  }
+
+  onAvatarSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] || null;
+    this.saveError = '';
+    if (!file) return;
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      this.saveError = 'Choose a JPG, PNG, GIF, or WebP image.';
+      input.value = '';
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      this.saveError = 'Profile photos must be 2 MB or smaller.';
+      input.value = '';
+      return;
+    }
+
+    this.avatarFile = file;
+    const reader = new FileReader();
+    reader.onload = () => this.avatarPreview = String(reader.result || '');
+    reader.readAsDataURL(file);
+  }
+
+  private async fileToBase64(file: File): Promise<string> {
+    const dataUrl = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ''));
+      reader.onerror = () => reject(new Error('Could not read the selected photo.'));
+      reader.readAsDataURL(file);
+    });
+    return dataUrl.split(',', 2)[1] || '';
+  }
+
+  async saveProfile() {
+    this.saveError = '';
+    if (!this.fullName.trim() || !this.username.trim() || !this.email.trim()) {
+      this.saveError = 'Display name, username, and email are required.';
+      return;
+    }
+
+    this.isSaving = true;
+    try {
+      const result = await this.supabaseService.updateProfile(this.userId, {
+        profileName: this.fullName.trim(),
+        username: this.username.trim(),
+        email: this.email.trim(),
+        ...(this.avatarFile ? {
+          avatarBase64: await this.fileToBase64(this.avatarFile),
+          avatarContentType: this.avatarFile.type
+        } : {})
+      });
+      if (result.error) throw result.error;
+
+      const user = result.data.user;
+      this.fullName = user.profile_name || user.name || this.fullName;
+      this.username = user.username || user.name || this.username;
+      this.email = user.email || this.email;
+      this.avatarUrl = user.avatar_url || this.avatarUrl;
+      this.avatarPreview = '';
+      this.avatarFile = null;
+      const alert = await this.alertCtrl.create({
+        header: 'Saved',
+        message: 'Your profile has been updated.',
+        buttons: ['OK']
+      });
+      await alert.present();
+    } catch (error: any) {
+      this.saveError = error?.message || 'Could not save your profile. Please try again.';
+    } finally {
+      this.isSaving = false;
     }
   }
 
@@ -108,6 +208,6 @@ export class ProfilePage implements OnInit {
   }
 
   async changePassword() {
-    this.router.navigateByUrl('/change-password');
+    this.router.navigateByUrl(`/change-password?returnUrl=${encodeURIComponent(this.profileUrl)}`);
   }
 }

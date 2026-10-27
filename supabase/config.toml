@@ -1,0 +1,4 @@
+project_id = "hplgfkgocbbwwgyzzzmx"
+
+[functions.account-service]
+verify_jwt = false
