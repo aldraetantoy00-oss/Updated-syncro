@@ -1,0 +1,20 @@
+{
+  "id": "/",
+  "name": "Syncro",
+  "short_name": "Syncro",
+  "description": "Syncro organization content submission and review app.",
+  "start_url": "/login",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f7fb",
+  "theme_color": "#15803d",
+  "icons": [
+    {
+      "src": "/assets/icon/syncro-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

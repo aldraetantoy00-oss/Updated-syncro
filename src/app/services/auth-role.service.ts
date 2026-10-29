@@ -52,6 +52,10 @@ export class AuthRoleService {
     return r === 'CREATOR' || r === 'ORGANIZATION' || r === 'DEPARTMENT' || r === 'ORG';
   }
 
+  async isDepartment() {
+    return (await this.loadRole()) === 'DEPARTMENT';
+  }
+
   async canPerformPairActions() {
     return (await this.isPair()) || (await this.isAdmin());
   }

@@ -1,11 +1,14 @@
 <ion-content class="pair-submissions-content">
   <div class="page">
-    <header class="app-header">
-      <div class="top">
+    <header class="app-header app-page-header">
+      <div class="top app-topbar">
         <ion-menu-button aria-label="Open menu">
           <ion-icon slot="icon-only" name="menu-outline"></ion-icon>
         </ion-menu-button>
-        <span>Syncro</span>
+        <span class="syncro-brand" aria-label="Syncro">
+          <ion-icon name="sync-outline" aria-hidden="true"></ion-icon>
+          <span>Syncro</span>
+        </span>
         <ion-button fill="clear" color="light" routerLink="/pair-tabs/notifications" aria-label="Notifications">
           <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
         </ion-button>
@@ -15,7 +18,7 @@
     <main class="content-area">
       <div class="page-title-row">
         <div>
-          <h1>PAIR All Submissions</h1>
+          <h1 class="app-section-title">PAIR All Submissions</h1>
           <p>Review and manage submissions from every organization.</p>
         </div>
         <ion-button fill="clear" color="medium" aria-label="Refresh submissions" (click)="loadSubmissions()" [disabled]="loading">
@@ -50,14 +53,14 @@
       <section class="submission-list" *ngIf="!loading && filteredSubmissions.length">
         <article class="submission-card" *ngFor="let submission of filteredSubmissions">
           <div class="status-line" [ngClass]="{
-            'pending-line': (submission.status || submission.workflow_status) === 'pending',
-            'review-line': (submission.status || submission.workflow_status) === 'submitted' || (submission.status || submission.workflow_status) === 'in_review',
-            'approved-line': (submission.status || submission.workflow_status) === 'approved' || (submission.status || submission.workflow_status) === 'completed',
-            'rejected-line': (submission.status || submission.workflow_status) === 'rejected',
-            'posted-line': (submission.status || submission.workflow_status) === 'posted'
+            'pending-line': getStatus(submission) === 'pending',
+            'review-line': getStatus(submission) === 'submitted' || getStatus(submission) === 'in_review',
+            'approved-line': getStatus(submission) === 'approved' || getStatus(submission) === 'completed',
+            'rejected-line': getStatus(submission) === 'rejected',
+            'posted-line': getStatus(submission) === 'posted'
           }"></div>
           <div class="submission-main">
-            <div class="submission-org">{{ submission.org_name || ('Organization #' + submission.user_id) }}</div>
+            <div class="submission-org">{{ submission.org_name || 'Organization' }}</div>
             <strong class="submission-caption">{{ submission.original_caption || submission.enhanced_caption || 'No caption' }}</strong>
             <div class="submission-meta">
               <ion-badge [color]="statusColor(submission)">{{ statusLabel(submission) }}</ion-badge>

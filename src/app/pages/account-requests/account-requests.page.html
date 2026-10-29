@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header class="app-page-header">
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/dashboard"></ion-back-button>
@@ -14,7 +14,7 @@
 
 <ion-content>
   <main class="requests-page">
-    <p class="intro">Review new organization accounts before they can sign in.</p>
+    <p class="intro">Choose whether each approved account is an organization or department. Both account types use the organization workspace.</p>
 
     <div class="state" *ngIf="loading">
       <ion-spinner name="crescent"></ion-spinner>
@@ -35,10 +35,24 @@
         <p>{{ request.departmentName }}</p>
         <time *ngIf="request.created_at">Requested {{ request.created_at | date:'mediumDate' }}</time>
       </div>
-      <ion-button color="success" (click)="approve(request)" [disabled]="request.approving">
-        <ion-spinner *ngIf="request.approving" name="crescent"></ion-spinner>
-        <span *ngIf="!request.approving">Approve</span>
-      </ion-button>
+      <div class="request-actions">
+        <ion-item class="account-type">
+          <ion-label>Account type</ion-label>
+          <ion-select
+            [(ngModel)]="request.accountType"
+            aria-label="Choose account type"
+            interface="popover"
+            [disabled]="request.approving"
+          >
+            <ion-select-option value="org">Organization</ion-select-option>
+            <ion-select-option value="department">Department</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-button color="success" (click)="approve(request)" [disabled]="request.approving">
+          <ion-spinner *ngIf="request.approving" name="crescent"></ion-spinner>
+          <span *ngIf="!request.approving">Approve</span>
+        </ion-button>
+      </div>
     </article>
   </main>
 </ion-content>

@@ -8,8 +8,10 @@
 }
 
 .app-header {
-  height: 50px;
-  padding: 0 8px;
+  box-sizing: border-box;
+  height: 72px;
+  min-height: 72px;
+  padding: 8px 16px;
   background: #16763a;
   color: #fff;
 
@@ -19,18 +21,38 @@
     align-items: center;
     height: 100%;
 
-    span {
-      justify-self: center;
-      color: #fff;
-      font-size: 18px;
-      font-weight: 800;
-    }
+  .syncro-brand {
+    position: static;
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: center;
+    transform: none;
+  }
 
-    ion-menu-button,
-    ion-button {
-      width: 40px;
-      height: 40px;
-      margin: 0;
+  span {
+    justify-self: center;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 800;
+  }
+
+  ion-menu-button {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+    width: 40px;
+    height: 40px;
+    margin: 0;
+    --color: #fff;
+  }
+
+  ion-button {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
+    width: 40px;
+    height: 40px;
+    margin: 0;
       --color: #fff;
     }
   }

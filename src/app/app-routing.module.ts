@@ -3,6 +3,7 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { PairGuard } from './guards/pair.guard';
 import { OrganizationGuard } from './guards/organization.guard';
 import { AdminGuard } from './guards/admin.guard';
+import { DepartmentGuard } from './guards/department.guard';
 
 const routes: Routes = [
 
@@ -57,6 +58,12 @@ const routes: Routes = [
   },
 
   {
+    path: 'department/organizations',
+    loadChildren: () => import('./pages/department-organizations/department-organizations.module').then(m => m.DepartmentOrganizationsPageModule),
+    canActivate: [DepartmentGuard]
+  },
+
+  {
     path: 'submission-details',
     loadChildren: () => import('./pages/submission-details/submission-details.module').then(m => m.SubmissionDetailsPageModule)
   },
@@ -77,7 +84,8 @@ const routes: Routes = [
   },
   {
     path: 'all-submissions',
-    loadChildren: () => import('./pages/all-submissions/all-submissions.module').then( m => m.AllSubmissionsPageModule)
+    redirectTo: 'tabs/all-submissions',
+    pathMatch: 'full'
   },
   {
     path: 'signup',

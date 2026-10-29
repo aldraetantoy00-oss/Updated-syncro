@@ -3,12 +3,12 @@
   <div class="page" *ngIf="!loading">
 
     <!-- HEADER -->
-    <div class="header">
-      <div class="top">
+    <div class="header app-page-header">
+      <div class="top app-topbar">
         <ion-button fill="clear" color="light" (click)="goBack()">
           <ion-icon name="arrow-back-outline"></ion-icon>
         </ion-button>
-        <h1>Submission Details</h1>
+        <h1 class="app-page-title">Submission Details</h1>
         <div style="width: 40px;"></div>
       </div>
     </div>
@@ -18,9 +18,9 @@
 
       <!-- STATUS SECTION -->
       <div class="status-section">
-        <ion-badge [color]="getStatusColor(submission.status)">
-          <ion-icon [name]="getStatusIcon(submission.status)"></ion-icon>
-          {{ getStatusText(submission.status) }}
+        <ion-badge [color]="getStatusColor(getEffectiveStatus(submission))">
+          <ion-icon [name]="getStatusIcon(getEffectiveStatus(submission))"></ion-icon>
+          {{ getStatusText(getEffectiveStatus(submission)) }}
         </ion-badge>
         <span class="workflow-status">{{ submission.workflow_status | uppercase }}</span>
       </div>
@@ -76,10 +76,19 @@
           <h3>🖼️ Attached Media</h3>
         </div>
         <div class="media-grid">
-          <img *ngFor="let media of submission.media_paths" 
-               [src]="media" 
-               alt="Media attachment"
-               class="media-item">
+          <ng-container *ngFor="let media of submission.media_paths; let i = index">
+            <img *ngIf="isImageAttachment(media)"
+                 [src]="media"
+                 [alt]="attachmentName(i)"
+                 class="media-item">
+            <a *ngIf="!isImageAttachment(media)"
+               class="attachment-download"
+               [href]="media"
+               [download]="attachmentName(i)">
+              <ion-icon name="document-attach-outline"></ion-icon>
+              {{ attachmentName(i) }}
+            </a>
+          </ng-container>
         </div>
       </div>
 
@@ -144,8 +153,8 @@
         <div class="meta-row">
           <span class="meta-label">Current Status</span>
           <span class="meta-value">
-            <ion-badge [color]="getStatusColor(submission.status)">
-              {{ getStatusText(submission.status) }}
+            <ion-badge [color]="getStatusColor(getEffectiveStatus(submission))">
+              {{ getStatusText(getEffectiveStatus(submission)) }}
             </ion-badge>
           </span>
         </div>

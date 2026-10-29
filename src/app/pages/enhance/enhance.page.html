@@ -1,10 +1,10 @@
 <ion-content class="page">
 
   <!-- HEADER -->
-  <div class="header">
+  <div class="header app-page-header">
 
     <div>
-      <h2>Review Submission</h2>
+      <h2 class="app-page-title">Review Submission</h2>
 
       <p>
         Review and provide feedback on the submission
@@ -34,7 +34,7 @@
     </div>
 
     <!-- AI PROVIDER (PAIR ONLY) -->
-    <div class="card" *ngIf="allowPairActions">
+    <div class="card" *ngIf="allowPairActions || allowDepartmentActions">
 
       <label>🤖 AI Provider</label>
 
@@ -66,7 +66,7 @@
     </div>
 
     <!-- TONE (PAIR ONLY) -->
-    <div class="card" *ngIf="allowPairActions">
+    <div class="card" *ngIf="allowPairActions || allowDepartmentActions">
 
       <label>✨ Tone</label>
 
@@ -86,7 +86,7 @@
 
     <!-- GENERATE (PAIR ONLY) -->
     <ion-button
-      *ngIf="allowPairActions"
+      *ngIf="allowPairActions || allowDepartmentActions"
       expand="block"
       color="secondary"
       (click)="generateAI()"
@@ -97,7 +97,7 @@
     </ion-button>
 
     <!-- ENHANCED TEXT -->
-    <div class="card" *ngIf="allowPairActions">
+    <div class="card" *ngIf="allowPairActions || allowDepartmentActions">
 
       <label>✍️ Enhanced Caption</label>
 
@@ -113,8 +113,8 @@
 
     </div>
 
-    <!-- DECISION (PAIR ONLY) -->
-    <div class="card" *ngIf="allowPairActions && !showPostedOption">
+    <!-- DECISION -->
+    <div class="card" *ngIf="(allowPairActions || allowDepartmentActions) && !showPostedOption">
 
       <label>📋 Decision</label>
 
@@ -157,7 +157,7 @@
     </div>
 
     <!-- FEEDBACK -->
-    <div class="card">
+    <div class="card feedback-card">
 
       <label>💬 Feedback for Organization</label>
 
@@ -165,17 +165,17 @@
         [(ngModel)]="feedback"
         auto-grow="true"
         placeholder="Provide constructive feedback or notes..."
-        [readonly]="!allowPairActions"
+        [readonly]="!allowPairActions && !allowDepartmentActions"
       ></ion-textarea>
 
-      <small *ngIf="allowPairActions">
+      <small *ngIf="allowPairActions || allowDepartmentActions">
         Your feedback will be sent to the organization
       </small>
 
     </div>
 
     <!-- ACTIONS -->
-    <div class="actions" *ngIf="allowPairActions">
+    <div class="actions" *ngIf="allowPairActions || allowDepartmentActions">
 
       <ion-button
         fill="outline"
@@ -191,6 +191,7 @@
         (click)="submitReview()"
         [disabled]="isSubmitting"
         class="submit-review-btn"
+        [class.reject-action]="decision === 'reject'"
       >
         <ion-icon [name]="decision === 'approve' ? 'checkmark-outline' : 'close-outline'" slot="start"></ion-icon>
         {{ isSubmitting ? 'Submitting...' : (decision === 'approve' ? 'Approve' : 'Reject') }}

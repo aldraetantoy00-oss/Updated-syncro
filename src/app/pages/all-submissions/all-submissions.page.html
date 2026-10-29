@@ -1,25 +1,32 @@
-<ion-content [fullscreen]="true">
+<ion-content class="all-submissions-content" [fullscreen]="true">
 
   <div class="page">
 
     <!-- HEADER -->
-    <div class="header">
+    <div class="header app-page-header">
 
-      <div class="top-bar">
+      <div class="top-bar app-topbar">
 
         <ion-menu-button aria-label="Open menu">
           <ion-icon slot="icon-only" name="menu-outline"></ion-icon>
         </ion-menu-button>
 
-        <span>Syncro</span>
+        <span class="syncro-brand" aria-label="Syncro">
+          <ion-icon name="sync-outline" aria-hidden="true"></ion-icon>
+          <span>Syncro</span>
+        </span>
 
-        <ion-icon name="notifications-outline"></ion-icon>
+        <ion-button fill="clear" color="light" routerLink="/notifications" aria-label="Notifications">
+          <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
+        </ion-button>
 
       </div>
 
-      <h1>My Submissions</h1>
+    </div>
 
-      </div>
+    <div class="submissions-title-row">
+      <h1 class="app-section-title">My Submissions</h1>
+    </div>
 
       <!-- Filters / Search / Apply moved below header for compact layout -->
       <div *ngIf="canReview" class="controls">
@@ -50,6 +57,7 @@
                 <ion-select-option value="pending">Pending</ion-select-option>
                 <ion-select-option value="in_review">In Review</ion-select-option>
                 <ion-select-option value="approved">Approved</ion-select-option>
+                <ion-select-option value="rejected">Rejected</ion-select-option>
                 <ion-select-option value="posted">Posted</ion-select-option>
               </ion-select>
             </ion-item>
@@ -72,7 +80,7 @@
         </thead>
         <tbody>
           <tr *ngFor="let post of filteredPosts">
-            <td>Organization #{{ post.user_id }}</td>
+            <td>{{ post.org_name || 'Organization' }}</td>
             <td class="title">{{ post.original_caption || post.enhanced_caption || 'No caption' }}</td>
             <td>
               <ion-badge [color]="statusColor(post)">{{ statusLabel(post) }}</ion-badge>
@@ -102,7 +110,7 @@
       <div *ngFor="let post of filteredPosts" class="recent-card">
 
           <div class="content">
-            <div class="org">{{ post.org_name ? post.org_name : ('Organization #' + post.user_id) }}</div>
+            <div class="org">{{ post.org_name || 'Organization' }}</div>
             <p class="subtitle">{{ post.original_caption || post.enhanced_caption || 'No caption' }}</p>
 
             <div class="meta">

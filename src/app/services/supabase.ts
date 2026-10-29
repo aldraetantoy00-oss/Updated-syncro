@@ -130,8 +130,48 @@ export class SupabaseService {
     return { data: result.data?.submissions || null, error };
   }
 
-  async approveAccountRequest(userId: string | number) {
-    const result = await this.callAccountFunction('approveAccountRequest', { userId }, true);
+  async getDepartmentOrganizations(): Promise<{ data: any[] | null; error: Error | null }> {
+    const result = await this.callAccountFunction('getDepartmentOrganizations', {}, true);
+    const errorMessage = result.error && typeof result.error === 'object' && 'message' in result.error
+      ? String(result.error.message)
+      : String(result.error || '');
+    const error = result.error ? new Error(errorMessage) : null;
+    return { data: result.data?.organizations || null, error };
+  }
+
+  async reviewDepartmentSubmission(
+    submissionId: string | number,
+    enhancedCaption: string,
+    feedback: string,
+    decision: 'approved' | 'rejected' = 'approved'
+  ) {
+    return this.callAccountFunction('reviewDepartmentSubmission', {
+      submissionId,
+      enhancedCaption,
+      feedback,
+      decision
+    }, true);
+  }
+
+  async getNotifications(): Promise<{ data: any[] | null; error: Error | null }> {
+    const result = await this.callAccountFunction('getNotifications', {}, true);
+    const errorMessage = result.error && typeof result.error === 'object' && 'message' in result.error
+      ? String(result.error.message)
+      : String(result.error || '');
+    const error = result.error ? new Error(errorMessage) : null;
+    return { data: result.data?.notifications || null, error };
+  }
+
+  async notifySubmissionCreated(submissionId: string | number) {
+    return this.callAccountFunction('notifySubmissionCreated', { submissionId }, true);
+  }
+
+  async notifySubmissionStatus(submissionId: string | number, decision: 'approved' | 'rejected' | 'posted') {
+    return this.callAccountFunction('notifySubmissionStatus', { submissionId, decision }, true);
+  }
+
+  async approveAccountRequest(userId: string | number, role: 'org' | 'department' = 'org') {
+    const result = await this.callAccountFunction('approveAccountRequest', { userId, role }, true);
     return { data: result.data?.approved ? { id: userId } : null, error: result.error };
   }
 

@@ -20,6 +20,7 @@ export class SidebarComponent {
 	loading = false;
 	isPair = false;
 	isAdmin = false;
+	isDepartment = false;
 
 	constructor(
 		private supabaseService: SupabaseService,
@@ -39,12 +40,14 @@ export class SidebarComponent {
 				this.avatarUrl = '';
 				this.isPair = false;
 				this.isAdmin = false;
+				this.isDepartment = false;
 				this.loading = false;
 				return;
 			}
 
 			this.email = user.email ?? '';
 			this.isAdmin = await this.authRole.isAdmin().catch(() => false);
+			this.isDepartment = await this.authRole.isDepartment().catch(() => false);
 
 			// Detect user role
 			try {

@@ -75,7 +75,8 @@ small {
 }
 
 .decision-chips button {
-  padding: 12px;
+  min-height: 42px;
+  padding: 10px 12px;
   border-radius: 8px;
   border: 2px solid rgba(229,231,235,1);
   background: white;
@@ -90,9 +91,9 @@ small {
 }
 
 .approve-chip.active {
-  border-color: var(--ion-color-secondary);
-  background-color: rgba(16,185,129,0.08);
-  color: var(--ion-color-secondary);
+  border-color: #16a34a;
+  background-color: rgba(22, 163, 74, 0.06);
+  color: #16a34a;
 }
 
 .reject-chip.active {
@@ -119,6 +120,38 @@ small {
 
 .actions ion-button {
   flex: 1;
+  min-height: 42px;
+  margin: 0;
+  font-weight: 600;
+  --border-radius: 9px;
+}
+
+.actions ion-button[fill="outline"] {
+  --border-width: 2px;
+  --border-color: #15803d;
+  --color: #15803d;
+}
+
+.actions .submit-review-btn {
+  --background: #16a34a;
+  --background-hover: #15803d;
+  --color: #fff;
+  box-shadow: 0 2px 5px rgba(22, 163, 74, 0.25);
+}
+
+.actions .submit-review-btn.reject-action {
+  --background: var(--ion-color-danger);
+  --background-hover: var(--ion-color-danger-shade);
+  box-shadow: 0 2px 5px rgba(239, 68, 68, 0.2);
+}
+
+.feedback-card ion-textarea {
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 10px;
+  --padding-bottom: 10px;
+  --background: transparent;
+  font-size: 14px;
 }
 
 .info-text {
@@ -133,5 +166,15 @@ small {
 
   ion-icon {
     font-size: 18px;
+  }
+
+  @media (max-width: 420px) {
+    .actions {
+      gap: 8px;
+    }
+
+    .actions ion-button {
+      font-size: 12px;
+    }
   }
 }

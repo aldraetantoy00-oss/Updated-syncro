@@ -1,37 +1,61 @@
 .signup-page {
-  --background: #f5f7fb;
+  --background: #ffffff;
 }
 
 .container {
-  padding: 30px 24px;
+  box-sizing: border-box;
+  width: min(100%, 430px);
+  min-height: 100%;
+  margin: 0 auto;
+  padding: 32px 22px max(32px, env(safe-area-inset-bottom));
 }
 
 .logo-section {
   text-align: center;
-  margin-top: 40px;
-  margin-bottom: 40px;
+  margin: 8px 0 26px;
 }
 
 .logo-section h1 {
-  font-size: 38px;
+  width: 100%;
+  margin: 0;
+  font-size: 36px;
   font-weight: 800;
   color: #166534;
 }
 
-.logo-section p {
+.logo-section .form-subtitle {
+  margin: 10px 0 0;
   color: #6b7280;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.logo-section .form-description {
+  max-width: 340px;
+  margin: 18px auto 0;
+  color: #4b5563;
+  font-size: 15px;
+  line-height: 1.5;
 }
 
 .input-group {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .input-group label {
-  display: block;
-  margin-bottom: 8px;
-
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 8px;
   font-weight: 600;
   color: #166534;
+  line-height: 1.35;
+}
+
+.input-group label ion-icon {
+  flex: 0 0 auto;
+  font-size: 15px;
 }
 
 .input-group small {
@@ -54,47 +78,94 @@
 }
 
 .form-error {
-  margin: -4px 0 16px;
+  margin: -2px 0 16px;
   padding: 12px 14px;
   border: 1px solid #f1b5b2;
-  border-radius: 6px;
+  border-radius: 10px;
   background: #fff1f0;
+  line-height: 1.45;
 }
 
-ion-input {
-  background: white;
-
-  border-radius: 14px;
-
-  padding: 14px;
-
+ion-input,
+ion-select {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 50px;
   border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #f8f9fb;
+  --background: #f8f9fb;
+  --color: #1f2937;
+  --placeholder-color: #6b7280;
+  --padding-start: 14px;
+  --padding-end: 14px;
+  --highlight-color-focused: var(--syncro-green);
+}
+
+ion-select {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
 }
 
 .signup-btn {
-  margin-top: 25px;
-
-  --background:
-    linear-gradient(
-      135deg,
-      #166534,
-      #22c55e
-    );
-
-  height: 52px;
-
+  min-height: 50px;
+  margin: 12px 0 0;
+  --background: var(--syncro-green);
+  --background-hover: var(--syncro-green-dark);
+  --border-radius: 8px;
   font-weight: 700;
 }
 
 .login-link {
-  text-align: center;
-
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   margin-top: 24px;
-
   color: #6b7280;
+  font-size: 14px;
 }
 
-.login-link span {
-  color: #16a34a;
+.login-link .login-prompt {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.login-link .login-prompt::before,
+.login-link .login-prompt::after {
+  width: clamp(16px, 8vw, 48px);
+  height: 1px;
+  background: #e5e7eb;
+  content: "";
+}
+
+.login-link a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  color: var(--syncro-green);
   font-weight: 700;
+  text-decoration: none;
+}
+
+.login-link a:focus-visible {
+  border-radius: 4px;
+  outline: 2px solid var(--syncro-green);
+  outline-offset: 3px;
+}
+
+@media (max-width: 360px) {
+  .container {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .logo-section .form-description {
+    font-size: 14px;
+  }
 }

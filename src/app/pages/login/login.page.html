@@ -8,8 +8,9 @@
       <div class="form-wrapper">
 
         <!-- LOGO -->
-        <h1 class="logo">
-          ⟳ Syncro
+        <h1 class="logo syncro-brand" aria-label="Syncro">
+          <ion-icon name="sync-outline" aria-hidden="true"></ion-icon>
+          <span>Syncro</span>
         </h1>
 
         <div class="account-request-notice" *ngIf="accountRequestSubmitted" role="status" aria-live="polite">
@@ -49,9 +50,25 @@
 
           <ion-input
             [(ngModel)]="password"
-            type="password"
+            [type]="showPassword ? 'text' : 'password'"
             placeholder="Password"
           ></ion-input>
+
+          <ion-button
+            fill="clear"
+            type="button"
+            class="password-visibility-toggle"
+            slot="end"
+            [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+            [attr.aria-pressed]="showPassword"
+            (click)="togglePasswordVisibility()"
+          >
+            <ion-icon
+              slot="icon-only"
+              [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"
+              aria-hidden="true"
+            ></ion-icon>
+          </ion-button>
 
         </ion-item>
 

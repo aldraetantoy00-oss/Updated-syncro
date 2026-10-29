@@ -12,6 +12,8 @@ import { AuthRoleService } from '../../services/auth-role.service';
 export class EnhancePage {
 
   @Input() post: any;
+  @Input() departmentMode = false;
+  @Input() departmentInitialDecision: 'approve' | 'reject' = 'approve';
 
   selectedProvider = 'openai';
 
@@ -25,6 +27,8 @@ export class EnhancePage {
 
   allowPairActions = false;
 
+  allowDepartmentActions = false;
+
   isSubmitting = false;
 
   showPostedOption = false;
@@ -36,6 +40,7 @@ export class EnhancePage {
   ) {}
 
   ngOnInit() {
+    if (this.departmentMode) this.decision = this.departmentInitialDecision;
 
     // SHOW ORIGINAL CAPTION
     this.enhancedText =
@@ -49,10 +54,12 @@ export class EnhancePage {
       this.enhancedText = this.post.enhanced_caption;
     }
 
-    // determine if current user may run PAIR/admin actions (generate/preview/approve)
     this.authRole.canPerformPairActions().then(flag => {
       this.allowPairActions = !!flag;
     }).catch(() => { this.allowPairActions = false; });
+    this.authRole.isDepartment().then(flag => {
+      this.allowDepartmentActions = this.departmentMode && !!flag;
+    }).catch(() => { this.allowDepartmentActions = false; });
 
   }
 
@@ -73,12 +80,12 @@ This version is more engaging, professional, and polished.`;
   async submitReview() {
 
     // Validation
-    if (!this.allowPairActions) {
+    if (!this.allowPairActions && !this.allowDepartmentActions) {
       alert('This action is restricted.');
       return;
     }
 
-    if (this.decision === 'approve' && this.enhancedText.trim().length < 10) {
+    if ((this.decision === 'approve' || this.allowDepartmentActions) && this.enhancedText.trim().length < 10) {
       alert('Enhanced caption must be at least 10 characters');
       return;
     }
@@ -86,6 +93,29 @@ This version is more engaging, professional, and polished.`;
     this.isSubmitting = true;
 
     try {
+      if (this.allowDepartmentActions) {
+        const departmentDecision = this.decision === 'reject' ? 'rejected' : 'approved';
+        const result = await this.supabaseService.reviewDepartmentSubmission(
+          this.post.id,
+          this.enhancedText,
+          this.feedback,
+          departmentDecision
+        );
+        if (result.error) {
+          throw result.error;
+        }
+
+        const notificationResult = await this.supabaseService.notifySubmissionStatus(this.post.id, departmentDecision);
+        if (notificationResult.error) {
+          console.error('Department review was saved, but the organization could not be notified:', notificationResult.error);
+        }
+
+        this.isSubmitting = false;
+        alert(`Submission ${departmentDecision} by the department successfully!`);
+        this.modalCtrl.dismiss({ refreshed: true });
+        return;
+      }
+
       // Prepare update object
       const updateObj: any = {
         pair_feedback: this.feedback,
@@ -121,44 +151,15 @@ This version is more engaging, professional, and polished.`;
         throw error;
       }
 
-      // Get user ID for notification
-      const user = await this.supabaseService.getUser();
-      const notifiable_id = this.post.user_id || user?.id || 1;
-
-      // INSERT NOTIFICATION
-      let notifType = 'App\\Notifications\\SubmissionApproved';
-      let notifMessage = 'Your submission was approved by PAIR!';
-      let notifTitle = 'Submission Approved';
-
-      if (this.decision === 'reject') {
-        notifType = 'App\\Notifications\\SubmissionRejected';
-        notifMessage = 'Your submission needs revisions. Please check feedback.';
-        notifTitle = 'Submission Rejected';
-      } else if (this.decision === 'posted') {
-        notifType = 'App\\Notifications\\SubmissionPosted';
-        notifMessage = 'Your submission has been posted!';
-        notifTitle = 'Submission Posted';
+      const decision = this.decision === 'reject'
+        ? 'rejected'
+        : this.decision === 'posted'
+          ? 'posted'
+          : 'approved';
+      const notificationResult = await this.supabaseService.notifySubmissionStatus(this.post.id, decision);
+      if (notificationResult.error) {
+        console.error('Review was saved, but the organization could not be notified:', notificationResult.error);
       }
-
-      const { error: notifError } =
-        await this.supabaseService.supabase
-          .from('notifications')
-          .insert([{
-            id: crypto.randomUUID(),
-            type: notifType,
-            notifiable_type: 'App\\Models\\User',
-            notifiable_id: notifiable_id,
-            data: JSON.stringify({
-              title: notifTitle,
-              message: notifMessage,
-              submission_id: this.post.id
-            }),
-            created_at: new Date(),
-            updated_at: new Date()
-          }]);
-
-      console.log('✅ Notification sent');
-      if (notifError) console.warn('Notification error:', notifError);
 
       this.isSubmitting = false;
 

@@ -1,4 +1,4 @@
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="organization-dashboard">
 
   <div class="page">
 
@@ -11,15 +11,20 @@
           <ion-icon slot="icon-only" name="menu-outline"></ion-icon>
         </ion-menu-button>
 
-        <span>Syncro</span>
+        <span class="syncro-brand" aria-label="Syncro">
+          <ion-icon name="sync-outline" aria-hidden="true"></ion-icon>
+          <span>Syncro</span>
+        </span>
 
-        <ion-icon name="notifications-outline"></ion-icon>
+        <ion-button fill="clear" color="light" routerLink="/tabs/notifications" aria-label="Notifications">
+          <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
+        </ion-button>
 
       </div>
 
-      <h2>Welcome back,</h2>
+      
 
-      <h1>SampleOrg 👋</h1>
+      <h1>Hello👋</h1>
 
       <p>Here’s what’s happening today.</p>
 
@@ -109,16 +114,18 @@
       </span>
 
       <!-- SEE ALL BUTTON -->
-      <div
+      <a
         class="see-all-btn"
-        routerLink="/all-submissions"
+        routerLink="/tabs/all-submissions"
+        routerDirection="forward"
+        aria-label="See all submissions"
       >
 
         <span>See All</span>
 
         <ion-icon name="arrow-forward-outline"></ion-icon>
 
-      </div>
+      </a>
 
     </div>
 
@@ -133,9 +140,10 @@
   <div
     class="status-line"
     [ngClass]="{
-      'pending-line': post.status === 'pending',
-      'review-line': post.status === 'in_review',
-      'approved-line': post.status === 'approved'
+      'pending-line': getStatus(post) === 'pending',
+      'review-line': getStatus(post) === 'in_review' || getStatus(post) === 'submitted',
+      'approved-line': getStatus(post) === 'approved',
+      'rejected-line': getStatus(post) === 'rejected'
     }"
   ></div>
 
@@ -159,7 +167,7 @@
       <!-- PENDING -->
       <ion-badge
         color="warning"
-        *ngIf="post.status === 'pending'"
+        *ngIf="getStatus(post) === 'pending'"
       >
         Pending
       </ion-badge>
@@ -167,7 +175,7 @@
       <!-- REVIEW -->
       <ion-badge
         color="primary"
-        *ngIf="post.status === 'in_review'"
+        *ngIf="getStatus(post) === 'in_review' || getStatus(post) === 'submitted'"
       >
         Reviewing
       </ion-badge>
@@ -175,9 +183,16 @@
       <!-- APPROVED -->
       <ion-badge
         color="success"
-        *ngIf="post.status === 'approved'"
+        *ngIf="getStatus(post) === 'approved'"
       >
         Approved
+      </ion-badge>
+
+      <ion-badge
+        color="danger"
+        *ngIf="getStatus(post) === 'rejected'"
+      >
+        Rejected
       </ion-badge>
 
       <!-- DATE -->

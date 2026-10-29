@@ -49,6 +49,15 @@ ion-content {
   transform: scale(0.98);
 }
 
+.notif-card.clickable {
+  cursor: pointer;
+}
+
+.notif-card.clickable:focus-visible {
+  outline: 2px solid var(--syncro-green, #15803d);
+  outline-offset: 2px;
+}
+
 /* ICON */
 .notif-icon {
   width: 50px;

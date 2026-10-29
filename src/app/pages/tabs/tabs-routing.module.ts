@@ -16,6 +16,10 @@ const routes: Routes = [
         loadChildren: () => import('../submit/submit.module').then(m => m.SubmitPageModule)
       },
       {
+        path: 'all-submissions',
+        loadChildren: () => import('../all-submissions/all-submissions.module').then(m => m.AllSubmissionsPageModule)
+      },
+      {
         path: 'notifications',
         loadChildren: () => import('../notifications/notifications.module').then(m => m.NotificationsPageModule)
       },

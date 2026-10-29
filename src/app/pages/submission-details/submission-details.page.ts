@@ -99,6 +99,8 @@ export class SubmissionDetailsPage implements OnInit {
         return 'success';
       case 'posted':
         return 'secondary';
+      case 'rejected':
+        return 'danger';
       default:
         return 'medium';
     }
@@ -115,6 +117,8 @@ export class SubmissionDetailsPage implements OnInit {
         return 'checkmark-circle-outline';
       case 'posted':
         return 'cloud-upload-outline';
+      case 'rejected':
+        return 'close-circle-outline';
       default:
         return 'help-circle-outline';
     }
@@ -131,9 +135,26 @@ export class SubmissionDetailsPage implements OnInit {
         return 'Approved';
       case 'posted':
         return 'Posted';
+      case 'rejected':
+        return 'Rejected';
       default:
         return 'Unknown';
     }
+  }
+
+  getEffectiveStatus(submission: any): string {
+    const workflowStatus = String(submission?.workflow_status || '').toLowerCase();
+    if (workflowStatus === 'rejected') return workflowStatus;
+    return String(submission?.status || workflowStatus).toLowerCase();
+  }
+
+  isImageAttachment(media: string): boolean {
+    return /^data:image\//i.test(media || '');
+  }
+
+  attachmentName(index: number): string {
+    const name = this.submission?.media_names?.[index];
+    return typeof name === 'string' && name.trim() ? name : `Attachment ${index + 1}`;
   }
 
   goBack() {

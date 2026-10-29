@@ -1,13 +1,18 @@
-<ion-content>
+<ion-content class="submit-content">
 
   <!-- HEADER -->
-  <div class="header">
-    <div class="top-bar">
+  <div class="header app-page-header">
+    <div class="top-bar app-topbar">
       <ion-menu-button aria-label="Open menu">
         <ion-icon slot="icon-only" name="menu-outline"></ion-icon>
       </ion-menu-button>
-      <span>Syncro</span>
-      <ion-icon name="notifications-outline"></ion-icon>
+      <span class="syncro-brand" aria-label="Syncro">
+        <ion-icon name="sync-outline" aria-hidden="true"></ion-icon>
+        <span>Syncro</span>
+      </span>
+      <ion-button fill="clear" color="light" routerLink="/notifications" aria-label="Notifications">
+        <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
+      </ion-button>
     </div>
   </div>
 
@@ -16,24 +21,79 @@
     <!-- TITLE -->
     <h2>Submit Content</h2>
     <p class="subtitle">
-      Share your content with the PAIR office for review and enhancement
+      Share your content with your Department or PAIR for review
     </p>
 
-    <!-- CAPTION -->
+    <section class="form-section">
+      <h3>What are you submitting?</h3>
+      <div class="choice-grid">
+        <button
+          type="button"
+          class="choice-card"
+          [class.selected]="contentType === 'social_media'"
+          (click)="contentType = 'social_media'"
+        >
+          <strong><ion-icon name="share-social-outline"></ion-icon> Social media post</strong>
+          <span>A concise, informational post for university social channels.</span>
+        </button>
+        <button
+          type="button"
+          class="choice-card"
+          [class.selected]="contentType === 'website_article'"
+          (click)="contentType = 'website_article'"
+        >
+          <strong><ion-icon name="newspaper-outline"></ion-icon> USJR website article</strong>
+          <span>A detailed article draft for the official university website.</span>
+        </button>
+      </div>
+      <p class="hint">This submits content for review only. Publishing integrations are not enabled.</p>
+    </section>
+
+    <section class="form-section destination-section">
+      <h3>Send this submission to</h3>
+      <label class="radio-option" *ngIf="!isDepartmentUser">
+        <input
+          type="radio"
+          name="submissionTarget"
+          value="department"
+          [(ngModel)]="submissionTarget"
+          [disabled]="departmentId === null"
+        />
+        <span>{{ departmentName }} — Department review</span>
+      </label>
+      <label class="radio-option">
+        <input type="radio" name="submissionTarget" value="pair" [(ngModel)]="submissionTarget" />
+        <span>PAIR — school-wide publication</span>
+      </label>
+      <p class="hint" *ngIf="!isDepartmentUser">
+        Your Department is {{ departmentName }}. Choose Department review or send directly to PAIR for school-wide review.
+      </p>
+      <p class="hint" *ngIf="isDepartmentUser">
+        Department submissions are sent to PAIR for school-wide review.
+      </p>
+      <p class="field-error" *ngIf="departmentLoadError">{{ departmentLoadError }}</p>
+    </section>
+
     <div class="card">
-      <label>📄 Caption / Description</label>
+      <label>
+        <ion-icon name="document-text-outline"></ion-icon>
+        {{ contentType === 'social_media' ? 'Social media post' : 'USJR website article' }}
+      </label>
       <ion-textarea
         [(ngModel)]="content"
-        placeholder="Write your post caption here. Be clear and descriptive..."
+        [placeholder]="contentType === 'social_media'
+          ? 'Write a concise, informational post. Include confirmed dates, locations, and key details.'
+          : 'Write a detailed article draft for the official university website.'"
         [maxlength]="maxCaptionLength"
         [counter]="true"
         auto-grow="true">
       </ion-textarea>
+      <p class="hint">Keep it concise. Maximum {{ maxCaptionLength | number }} characters.</p>
     </div>
 
     <!-- LINKS -->
     <div class="card">
-      <label>🔗 Related Links (Optional)</label>
+      <label><ion-icon name="link-outline"></ion-icon> Related Links (Optional)</label>
 
       <div *ngFor="let link of links; let i = index" class="link-row">
         <ion-input [(ngModel)]="links[i]" placeholder="https://example.com"></ion-input>
@@ -43,7 +103,7 @@
         </ion-button>
       </div>
 
-      <ion-button size="small" fill="outline" (click)="addLink()">
+      <ion-button size="small" fill="outline" color="success" (click)="addLink()">
         + Add Another Link
       </ion-button>
 
@@ -52,29 +112,45 @@
       </p>
     </div>
 
-    <!-- IMAGE UPLOAD -->
+    <!-- FILE UPLOAD -->
     <div class="card">
-      <label>🖼 Upload Images (Optional)</label>
+      <label><ion-icon name="attach-outline"></ion-icon> Attach files (optional)</label>
 
       <div class="upload-box">
-        <input type="file" multiple (change)="onFileSelected($event)" />
+        <input
+          type="file"
+          multiple
+          accept=".jpg,.jpeg,.png,.webp,.gif,.doc,.docx,.pdf,.txt"
+          (change)="onFileSelected($event)"
+        />
 
         <ion-icon name="cloud-upload-outline"></ion-icon>
-        <p>Drag and drop images here</p>
-        <small>or click to browse</small>
-        <small>JPEG, PNG, GIF (Max 2MB each)</small>
+        <p>Drag and drop files here or click to browse</p>
+        <small>JPG, PNG, WebP, GIF, DOC/DOCX, PDF, TXT — max 5 MB each</small>
       </div>
 
-      <!-- PREVIEW -->
-      <div class="preview">
-        <img *ngFor="let img of imagePreviews" [src]="img" />
+      <p class="field-error" *ngIf="fileError" role="alert">{{ fileError }}</p>
+      <div class="attachment-list" *ngIf="attachments.length">
+        <div class="attachment" *ngFor="let attachment of attachments; let i = index">
+          <img *ngIf="attachmentIsImage(attachment.file)" [src]="attachment.dataUrl" [alt]="attachment.file.name" />
+          <ion-icon *ngIf="!attachmentIsImage(attachment.file)" name="document-outline"></ion-icon>
+          <span>{{ attachment.file.name }}</span>
+          <ion-button fill="clear" color="danger" (click)="removeAttachment(i)" [attr.aria-label]="'Remove ' + attachment.file.name">
+            <ion-icon slot="icon-only" name="close-circle-outline"></ion-icon>
+          </ion-button>
+        </div>
       </div>
     </div>
 
-    <!-- SUBMIT BUTTON -->
-    <ion-button expand="block" color="success" (click)="submit()" class="submit-btn" [disabled]="isSubmitting">
-      {{ isSubmitting ? 'Submitting...' : 'Submit for Review' }}
-    </ion-button>
+    <div class="form-actions">
+      <ion-button expand="block" color="success" (click)="submit()" class="submit-btn" [disabled]="isSubmitting">
+        <ion-icon name="paper-plane-outline" slot="start"></ion-icon>
+        {{ isSubmitting ? 'Submitting...' : 'Submit for Review' }}
+      </ion-button>
+      <ion-button expand="block" fill="outline" color="medium" (click)="cancel()" [disabled]="isSubmitting">
+        Cancel
+      </ion-button>
+    </div>
 
   </div>
 

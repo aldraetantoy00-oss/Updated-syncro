@@ -23,6 +23,9 @@
 
 /* LOGO */
 .logo {
+  display: flex;
+  justify-content: center;
+  width: 100%;
   font-size: 38px;
   font-weight: bold;
 
@@ -56,12 +59,23 @@
   height: 56px;
 }
 
+.password-visibility-toggle {
+  --color: #6b7280;
+  --padding-start: 8px;
+  --padding-end: 8px;
+  margin: 0;
+}
+
+.password-visibility-toggle ion-icon {
+  font-size: 20px;
+}
+
 /* LOGIN BUTTON */
 .login-btn {
   margin-top: 20px;
 
-  --background: #123f16;
-  --background-hover: #1f5c25;
+  --background: var(--syncro-green);
+  --background-hover: var(--syncro-green-dark);
 
   --border-radius: 10px;
 
@@ -70,7 +84,7 @@
   font-size: 16px;
   font-weight: bold;
 
-  letter-spacing: 1px;
+  letter-spacing: 0;
 }
 
 /* TEXT */

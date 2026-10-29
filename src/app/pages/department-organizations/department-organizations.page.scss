@@ -1,0 +1,244 @@
+.department-organizations-content {
+  --background: #f5f7fb;
+  --padding-bottom: 66px;
+}
+
+.department-header {
+  box-sizing: border-box;
+  height: 72px;
+  min-height: 72px;
+  padding: 8px 16px;
+}
+
+.department-header .top {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  min-height: 48px;
+}
+
+.department-header .syncro-brand {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: center;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.department-header ion-menu-button {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: start;
+  --color: #fff;
+}
+
+.department-header ion-button {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+  --color: #fff;
+}
+
+.organizations-page {
+  width: min(100%, 900px);
+  margin: 0 auto;
+  padding: 20px 16px 36px;
+}
+
+.page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.page-heading h1 {
+  margin: 0;
+  color: #1d2b22;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.page-heading p {
+  margin: 6px 0 0;
+  color: var(--ion-color-medium-shade);
+}
+
+ion-searchbar {
+  padding: 0;
+  margin-bottom: 14px;
+  --background: #fff;
+  --border-radius: 12px;
+  --box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+}
+
+.organization-list {
+  display: grid;
+  gap: 12px;
+}
+
+.organization-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.05);
+}
+
+.organization-icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(21, 128, 61, 0.1);
+  color: var(--syncro-green, #15803d);
+  font-size: 22px;
+}
+
+.organization-info {
+  min-width: 0;
+}
+
+.organization-info h2 {
+  margin: 0 0 5px;
+  color: #1d2b22;
+  font-size: 16px;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+.organization-info p,
+.organization-info a {
+  display: block;
+  margin: 3px 0 0;
+  color: var(--ion-color-medium-shade);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.organization-info a {
+  color: var(--syncro-green, #15803d);
+  text-decoration: none;
+}
+
+.organization-submissions {
+  margin-top: 16px;
+}
+
+.organization-submissions h3 {
+  margin: 0 0 8px;
+  color: #374151;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.submission-card {
+  margin-top: 8px;
+  padding: 12px;
+  border: 1px solid #e8eee9;
+  border-radius: 12px;
+  background: #f9fbf9;
+}
+
+.submission-caption {
+  margin: 0 0 9px;
+  color: #1f2937;
+  font-size: 14px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.submission-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.submission-meta ion-badge {
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.submission-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 0;
+}
+
+.submission-actions ion-button {
+  margin: 0;
+  font-size: 12px;
+}
+
+.submission-actions .review-action {
+  --background: #14532d;
+  --background-hover: #166534;
+  --color: #fff;
+  --border-radius: 7px;
+  font-weight: 700;
+}
+
+.submission-actions .evaluate-action {
+  --border-color: var(--syncro-green, #15803d);
+  --color: var(--syncro-green, #15803d);
+  --border-radius: 7px;
+  font-weight: 700;
+}
+
+.submission-meta time,
+.no-submissions {
+  color: var(--ion-color-medium-shade);
+  font-size: 12px;
+}
+
+.no-submissions {
+  margin: 0;
+}
+
+.page-state {
+  display: flex;
+  min-height: 120px;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--ion-color-medium-shade);
+  text-align: center;
+}
+
+.page-state.error {
+  flex-direction: column;
+  color: var(--ion-color-danger);
+}
+
+.department-bottom-nav {
+  border-top: 1px solid #d6dbe2;
+  background: #f5f7fb;
+}
+
+.department-bottom-nav ion-tab-bar {
+  min-height: 56px;
+  padding-bottom: env(safe-area-inset-bottom);
+  border-top: 0;
+  background: #f5f7fb;
+}
+
+.department-bottom-nav ion-tab-button {
+  --color: #525866;
+  --color-selected: #15803d;
+  font-size: 12px;
+}
+
+.department-bottom-nav ion-tab-button ion-icon {
+  font-size: 20px;
+}

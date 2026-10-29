@@ -31,21 +31,21 @@ export class PairAllSubmissionsPage implements OnInit {
   async loadSubmissions() {
     this.loading = true;
     this.error = '';
-    const { data, error } = await this.supabaseService.supabase
-      .from('submissions')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(1000);
+    const { data, error } = await this.supabaseService.getSubmissions();
 
     if (error) {
-      this.error = 'Could not load submissions. Check your connection and try again.';
+      console.error('Could not load PAIR submissions:', error);
+      this.error = error.message || 'Could not load submissions. Check your connection and try again.';
       this.submissions = [];
       this.filteredSubmissions = [];
       this.loading = false;
       return;
     }
 
-    this.submissions = data || [];
+    this.submissions = (data || []).map((submission) => ({
+      ...submission,
+      created_at: submission.created_at ? new Date(submission.created_at) : null
+    }));
     this.applyFilters();
     this.loading = false;
   }
@@ -53,7 +53,7 @@ export class PairAllSubmissionsPage implements OnInit {
   applyFilters() {
     const query = this.searchQuery.trim().toLowerCase();
     this.filteredSubmissions = this.submissions.filter((submission) => {
-      const status = String(submission.status || submission.workflow_status || '').toLowerCase();
+      const status = this.getStatus(submission);
       if (this.filterStatus && status !== this.filterStatus) return false;
       if (!query) return true;
       const content = [
@@ -66,15 +66,21 @@ export class PairAllSubmissionsPage implements OnInit {
     });
   }
 
+  getStatus(submission: any): string {
+    const workflowStatus = String(submission.workflow_status || '').toLowerCase();
+    if (workflowStatus === 'rejected') return workflowStatus;
+    return String(submission.status || workflowStatus).toLowerCase();
+  }
+
   statusLabel(submission: any) {
-    const status = String(submission.status || submission.workflow_status || '').toLowerCase();
+    const status = this.getStatus(submission);
     if (status === 'submitted' || status === 'in_review') return 'In review';
     if (status === 'completed') return 'Approved';
     return status ? status.charAt(0).toUpperCase() + status.slice(1).replace('_', ' ') : 'Unknown';
   }
 
   statusColor(submission: any) {
-    const status = String(submission.status || submission.workflow_status || '').toLowerCase();
+    const status = this.getStatus(submission);
     if (status === 'pending') return 'warning';
     if (status === 'submitted' || status === 'in_review') return 'primary';
     if (status === 'approved' || status === 'completed') return 'success';
@@ -100,12 +106,15 @@ export class PairAllSubmissionsPage implements OnInit {
   async reject(submission: any) {
     const confirmed = confirm('Reject this submission?');
     if (!confirmed) return;
+
+    this.error = '';
     const { error } = await this.supabaseService.supabase
       .from('submissions')
-      .update({ status: 'rejected', workflow_status: 'rejected' })
+      .update({ status: 'pending', workflow_status: 'rejected' })
       .eq('id', submission.id);
     if (error) {
-      this.error = 'Could not reject this submission.';
+      console.error('Could not reject submission:', error);
+      this.error = `Could not reject this submission: ${error.message}`;
       return;
     }
     await this.loadSubmissions();

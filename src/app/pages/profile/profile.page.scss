@@ -234,17 +234,26 @@
 
 @media (max-width: 760px) {
   .mobile-app-bar {
-    position: relative;
     display: grid;
-    grid-template-columns: 44px 1fr 44px;
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
     align-items: center;
     min-height: 50px;
     padding: 0 8px;
     background: #16763a;
     color: #fff;
 
-    ion-menu-button,
+    ion-menu-button {
+      grid-column: 1;
+      justify-self: start;
+      width: 40px;
+      height: 40px;
+      margin: 0;
+      --color: #fff;
+    }
+
     ion-button {
+      grid-column: 3;
+      justify-self: end;
       width: 40px;
       height: 40px;
       margin: 0;
@@ -252,10 +261,15 @@
     }
 
     .mobile-brand {
+      position: relative;
+      left: auto;
+      grid-column: 2;
+      grid-row: 1;
       justify-self: center;
       color: #fff;
       font-size: 15px;
       font-weight: 700;
+      transform: none;
     }
   }
 

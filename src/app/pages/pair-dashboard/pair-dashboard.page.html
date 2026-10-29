@@ -3,23 +3,28 @@
   <div class="page">
 
     <!-- HEADER -->
-    <div class="header">
+    <div class="header app-page-header">
 
-      <div class="top">
+      <div class="top app-topbar">
 
         <ion-menu-button>
           <ion-icon slot="icon-only" name="menu-outline"></ion-icon>
         </ion-menu-button>
 
-        <span>Syncro</span>
+        <span class="syncro-brand" aria-label="Syncro">
+          <ion-icon name="sync-outline" aria-hidden="true"></ion-icon>
+          <span>Syncro</span>
+        </span>
 
-        <ion-icon name="notifications-outline"></ion-icon>
+        <ion-button fill="clear" color="light" routerLink="/pair-tabs/notifications" aria-label="Notifications">
+          <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
+        </ion-button>
 
       </div>
 
       <h2>Welcome back,</h2>
 
-      <h1>PAIR Staff 👮</h1>
+      <h1 class="app-page-title">PAIR Staff 👮</h1>
 
       <p>Here's what's happening today.</p>
 
@@ -211,7 +216,7 @@
             name="checkmark-circle-outline"
           ></ion-icon>
 
-          Organization #{{ submission.user_id }}
+          {{ submission.org_name || 'Organization' }}
 
         </div>
 

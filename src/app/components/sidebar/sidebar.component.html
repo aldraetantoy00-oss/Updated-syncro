@@ -20,11 +20,16 @@
     </div>
   </div>
 
-  <!-- ORGANIZATION MENU -->
+  <!-- ORGANIZATION AND DEPARTMENT MENU -->
   <ion-list *ngIf="!isPair">
     <ion-item routerLink="/dashboard" routerLinkActive="selected" [routerLinkActiveOptions]="{ exact: true }" menuClose>
       <ion-icon slot="start" name="home-outline"></ion-icon>
       <ion-label>Dashboard</ion-label>
+    </ion-item>
+
+    <ion-item *ngIf="isDepartment" routerLink="/department/organizations" routerLinkActive="selected" menuClose>
+      <ion-icon slot="start" name="business-outline"></ion-icon>
+      <ion-label>My Organizations</ion-label>
     </ion-item>
 
     <ion-item routerLink="/submit" routerLinkActive="selected" [routerLinkActiveOptions]="{ exact: true }" menuClose>

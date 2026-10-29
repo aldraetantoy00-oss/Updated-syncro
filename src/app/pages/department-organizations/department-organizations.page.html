@@ -1,0 +1,117 @@
+<ion-content class="department-organizations-content">
+  <header class="department-header app-page-header">
+    <div class="top app-topbar">
+      <ion-menu-button aria-label="Open menu">
+        <ion-icon slot="icon-only" name="menu-outline"></ion-icon>
+      </ion-menu-button>
+      <span class="syncro-brand" aria-label="Syncro">
+        <ion-icon name="sync-outline" aria-hidden="true"></ion-icon>
+        <span>Syncro</span>
+      </span>
+      <ion-button fill="clear" color="light" routerLink="/notifications" aria-label="Notifications">
+        <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
+      </ion-button>
+    </div>
+  </header>
+
+  <main class="organizations-page">
+    <div class="page-heading">
+      <div>
+        <h1>My Organizations</h1>
+        <p>Organizations and posts in your department.</p>
+      </div>
+      <ion-button fill="clear" color="medium" aria-label="Refresh organizations" (click)="loadOrganizations()" [disabled]="loading">
+        <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+
+    <ion-searchbar
+      [(ngModel)]="searchQuery"
+      placeholder="Search organizations"
+      aria-label="Search organizations"
+    ></ion-searchbar>
+
+    <div class="page-state" *ngIf="loading" role="status">
+      <ion-spinner name="crescent"></ion-spinner>
+      <span>Loading organizations</span>
+    </div>
+
+    <div class="page-state error" *ngIf="!loading && error" role="alert">
+      <span>{{ error }}</span>
+      <ion-button fill="outline" size="small" (click)="loadOrganizations()">Try again</ion-button>
+    </div>
+
+    <div class="page-state" *ngIf="!loading && !error && organizations.length === 0">
+      No approved organizations are assigned to your department yet.
+    </div>
+
+    <div class="page-state" *ngIf="!loading && !error && organizations.length > 0 && filteredOrganizations.length === 0">
+      No organizations match your search.
+    </div>
+
+    <section class="organization-list" *ngIf="!loading && !error && filteredOrganizations.length > 0">
+      <article class="organization-card" *ngFor="let organization of filteredOrganizations">
+        <div class="organization-icon" aria-hidden="true">
+          <ion-icon name="business-outline"></ion-icon>
+        </div>
+        <div class="organization-info">
+          <h2>{{ organizationName(organization) }}</h2>
+          <p *ngIf="organization.username">Username: {{ organization.username }}</p>
+          <a *ngIf="organization.email" [href]="'mailto:' + organization.email">{{ organization.email }}</a>
+          <section class="organization-submissions">
+            <h3>Organization posts</h3>
+            <p class="no-submissions" *ngIf="organization.submissions.length === 0">No posts submitted yet.</p>
+            <article class="submission-card" *ngFor="let submission of organization.submissions">
+              <p class="submission-caption">
+                {{ submission.original_caption || submission.enhanced_caption || 'No caption provided' }}
+              </p>
+              <div class="submission-meta">
+                <ion-badge [color]="submissionStatusColor(submission)">
+                  {{ submissionStatusLabel(submission) }}
+                </ion-badge>
+                <time *ngIf="submission.created_at">{{ submission.created_at | date:'MMM d, y • h:mm a' }}</time>
+              </div>
+              <div class="submission-actions" *ngIf="canReviewSubmission(submission)">
+                <ion-button size="small" class="review-action" (click)="viewSubmission(submission)">
+                  <ion-icon name="eye-outline" slot="start"></ion-icon>
+                  Review
+                </ion-button>
+                <ion-button size="small" fill="outline" class="evaluate-action" (click)="reviewSubmission(organization, submission)">
+                  Evaluate
+                </ion-button>
+                <ion-button size="small" fill="outline" color="danger" (click)="reviewSubmission(organization, submission, 'reject')">
+                  <ion-icon name="close-outline" slot="start"></ion-icon>
+                  Reject
+                </ion-button>
+              </div>
+            </article>
+          </section>
+        </div>
+      </article>
+    </section>
+  </main>
+</ion-content>
+
+<ion-footer class="department-bottom-nav">
+  <ion-tab-bar>
+    <ion-tab-button tab="dashboard" routerLink="/tabs/dashboard">
+      <ion-icon name="home-outline"></ion-icon>
+      <ion-label>Dashboard</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="submit" routerLink="/tabs/submit">
+      <ion-icon name="add-circle-outline"></ion-icon>
+      <ion-label>Submission</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="notifications" routerLink="/tabs/notifications">
+      <ion-icon name="notifications-outline"></ion-icon>
+      <ion-label>Notifications</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="profile" routerLink="/tabs/profile">
+      <ion-icon name="person-circle-outline"></ion-icon>
+      <ion-label>Profile</ion-label>
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-footer>

@@ -22,7 +22,7 @@ function jsonResponse(body: unknown, status = 200) {
 }
 
 function normalizeRole(role: unknown) {
-  const normalized = String(role || "org").trim().toUpperCase();
+  const normalized = String(role || "org").trim().replace(/[\s-]+/g, "_").toUpperCase();
   return normalized === "ORG" || normalized === "ORGANISATION" ? "ORGANIZATION" : normalized;
 }
 
@@ -174,8 +174,12 @@ async function handleAction(action: string, body: Record<string, any>, request: 
     }
     const userId = body.userId;
     if (!userId) return jsonResponse({ error: "user_id_required" }, 400);
+    const requestedRole = String(body.role || "org").trim().toLowerCase();
+    if (!["org", "department"].includes(requestedRole)) {
+      return jsonResponse({ error: "invalid_account_role" }, 400);
+    }
     const { data, error } = await supabase.from("users")
-      .update({ account_status: "approved", is_approved: true })
+      .update({ role: requestedRole, account_status: "approved", is_approved: true })
       .eq("id", userId)
       .eq("account_status", "pending")
       .select("id")
@@ -213,7 +217,352 @@ async function handleAction(action: string, body: Record<string, any>, request: 
 
     const { data, error } = await query;
     if (error) throw error;
-    return jsonResponse({ submissions: data || [] });
+
+    const submissions = data || [];
+    if (["PAIR", "PAIR_STAFF", "ADMIN", "SUPER_ADMIN"].includes(role) && submissions.length) {
+      const organizationIds = [...new Set(
+        submissions
+          .map((submission) => submission.user_id)
+          .filter((userId) => userId !== null && userId !== undefined),
+      )];
+      if (organizationIds.length) {
+        const { data: organizations, error: organizationsError } = await supabase.from("users")
+          .select("id,name,profile_name")
+          .in("id", organizationIds);
+        if (organizationsError) throw organizationsError;
+
+        const namesById = new Map(
+          (organizations || []).map((organization) => [
+            String(organization.id),
+            organization.profile_name || organization.name || null,
+          ]),
+        );
+        return jsonResponse({
+          submissions: submissions.map((submission) => ({
+            ...submission,
+            org_name: submission.org_name || namesById.get(String(submission.user_id)) || null,
+          })),
+        });
+      }
+    }
+
+    return jsonResponse({ submissions });
+  }
+
+  if (action === "getDepartmentOrganizations") {
+    const token = await getTokenPayload(request);
+    if (!token) return jsonResponse({ error: "session_expired" }, 401);
+
+    const { data: departmentUser, error: departmentUserError } = await supabase.from("users")
+      .select("id,role,department_id,account_status,is_approved")
+      .eq("id", token.sub)
+      .maybeSingle();
+    if (departmentUserError) throw departmentUserError;
+    if (!departmentUser || (departmentUser.is_approved !== true && departmentUser.account_status !== "approved")) {
+      return jsonResponse({ error: "account_not_approved" }, 403);
+    }
+    if (normalizeRole(departmentUser.role) !== "DEPARTMENT") {
+      return jsonResponse({ error: "department_required" }, 403);
+    }
+    if (departmentUser.department_id === null || departmentUser.department_id === undefined) {
+      return jsonResponse({ error: "department_not_assigned" }, 400);
+    }
+
+    const { data: organizations, error: organizationsError } = await supabase.from("users")
+      .select("id,profile_name,name,username,email,department_id")
+      .eq("department_id", departmentUser.department_id)
+      .in("role", ["org", "ORG", "organization", "ORGANIZATION", "creator", "CREATOR"])
+      .or("is_approved.eq.true,account_status.eq.approved")
+      .order("profile_name", { ascending: true });
+    if (organizationsError) throw organizationsError;
+
+    const organizationList = organizations || [];
+    const organizationIds = organizationList.map((organization) => organization.id);
+    if (!organizationIds.length) return jsonResponse({ organizations: [] });
+
+    const { data: submissions, error: submissionsError } = await supabase.from("submissions")
+      .select("id,user_id,original_caption,enhanced_caption,status,workflow_status,created_at,reviewed_at,posted_at")
+      .in("user_id", organizationIds)
+      .order("created_at", { ascending: false })
+      .limit(1000);
+    if (submissionsError) throw submissionsError;
+
+    const namesById = new Map(
+      organizationList.map((organization) => [
+        String(organization.id),
+        organization.profile_name || organization.name || organization.username || null,
+      ]),
+    );
+    const submissionsByOrganization = new Map<string, Record<string, any>[]>();
+    for (const submission of submissions || []) {
+      const key = String(submission.user_id);
+      const organizationSubmissions = submissionsByOrganization.get(key) || [];
+      organizationSubmissions.push({
+        ...submission,
+        org_name: namesById.get(key) || null,
+      });
+      submissionsByOrganization.set(key, organizationSubmissions);
+    }
+
+    return jsonResponse({
+      organizations: organizationList.map((organization) => ({
+        ...organization,
+        submissions: submissionsByOrganization.get(String(organization.id)) || [],
+      })),
+    });
+  }
+
+  if (action === "reviewDepartmentSubmission") {
+    const token = await getTokenPayload(request);
+    if (!token) return jsonResponse({ error: "session_expired" }, 401);
+
+    const { data: departmentUser, error: departmentUserError } = await supabase.from("users")
+      .select("id,role,department_id,account_status,is_approved")
+      .eq("id", token.sub)
+      .maybeSingle();
+    if (departmentUserError) throw departmentUserError;
+    if (!departmentUser || (departmentUser.is_approved !== true && departmentUser.account_status !== "approved")) {
+      return jsonResponse({ error: "account_not_approved" }, 403);
+    }
+    if (normalizeRole(departmentUser.role) !== "DEPARTMENT") {
+      return jsonResponse({ error: "department_required" }, 403);
+    }
+    if (departmentUser.department_id === null || departmentUser.department_id === undefined) {
+      return jsonResponse({ error: "department_not_assigned" }, 400);
+    }
+
+    const submissionId = body.submissionId;
+    const decision = String(body.decision || "approved").toLowerCase();
+    const enhancedCaption = String(body.enhancedCaption || "").trim();
+    const feedback = String(body.feedback || "").trim();
+    if (submissionId === null || submissionId === undefined || submissionId === "") {
+      return jsonResponse({ error: "submission_id_required" }, 400);
+    }
+    if (!["approved", "rejected"].includes(decision)) {
+      return jsonResponse({ error: "invalid_department_decision" }, 400);
+    }
+    if (decision === "approved" && enhancedCaption.length < 10) {
+      return jsonResponse({ error: "enhanced_caption_too_short" }, 400);
+    }
+    if (enhancedCaption.length > 10000 || feedback.length > 5000) {
+      return jsonResponse({ error: "review_text_too_long" }, 400);
+    }
+
+    const { data: submission, error: submissionError } = await supabase.from("submissions")
+      .select("id,user_id,status,workflow_status,submission_target")
+      .eq("id", submissionId)
+      .maybeSingle();
+    if (submissionError) throw submissionError;
+    if (!submission) return jsonResponse({ error: "submission_not_found" }, 404);
+
+    const { data: organization, error: organizationError } = await supabase.from("users")
+      .select("id,role,department_id,account_status,is_approved")
+      .eq("id", submission.user_id)
+      .maybeSingle();
+    if (organizationError) throw organizationError;
+    if (
+      !organization ||
+      String(organization.department_id) !== String(departmentUser.department_id) ||
+      submission.submission_target !== "department" ||
+      !["ORG", "ORGANIZATION", "ORGANISATION", "CREATOR"].includes(normalizeRole(organization.role)) ||
+      (organization.is_approved !== true && organization.account_status !== "approved")
+    ) {
+      return jsonResponse({ error: "submission_access_denied" }, 403);
+    }
+
+    const currentStatus = String(submission.workflow_status || submission.status || "").toLowerCase();
+    if (["approved", "completed", "posted"].includes(currentStatus)) {
+      return jsonResponse({ error: "submission_already_reviewed" }, 409);
+    }
+
+    const updates: Record<string, unknown> = {
+      pair_feedback: feedback || null,
+      status: decision === "rejected" ? "pending" : "approved",
+      workflow_status: decision,
+      reviewed_at: new Date().toISOString(),
+    };
+    if (decision === "approved") updates.enhanced_caption = enhancedCaption;
+
+    const { data: updatedSubmission, error: updateError } = await supabase.from("submissions")
+      .update(updates)
+      .eq("id", submission.id)
+      .select("id,status,workflow_status")
+      .single();
+    if (updateError) throw updateError;
+
+    return jsonResponse({ submission: updatedSubmission });
+  }
+
+  if (action === "getNotifications") {
+    const token = await getTokenPayload(request);
+    if (!token) return jsonResponse({ error: "session_expired" }, 401);
+
+    const { data: user, error: userError } = await supabase.from("users")
+      .select("id,account_status,is_approved")
+      .eq("id", token.sub)
+      .maybeSingle();
+    if (userError) throw userError;
+    if (!user || (user.is_approved !== true && user.account_status !== "approved")) {
+      return jsonResponse({ error: "account_not_approved" }, 403);
+    }
+
+    const { data, error } = await supabase.from("notifications")
+      .select("*")
+      .eq("notifiable_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(1000);
+    if (error) throw error;
+    return jsonResponse({ notifications: data || [] });
+  }
+
+  if (action === "notifySubmissionCreated" || action === "notifySubmissionStatus") {
+    const token = await getTokenPayload(request);
+    if (!token) return jsonResponse({ error: "session_expired" }, 401);
+
+    const { data: user, error: userError } = await supabase.from("users")
+      .select("id,role,department_id,account_status,is_approved")
+      .eq("id", token.sub)
+      .maybeSingle();
+    if (userError) throw userError;
+    if (!user || (user.is_approved !== true && user.account_status !== "approved")) {
+      return jsonResponse({ error: "account_not_approved" }, 403);
+    }
+
+    const submissionId = body.submissionId;
+    if (submissionId === null || submissionId === undefined || submissionId === "") {
+      return jsonResponse({ error: "submission_id_required" }, 400);
+    }
+    const { data: submission, error: submissionError } = await supabase.from("submissions")
+      .select("id,user_id,status,workflow_status,submission_target")
+      .eq("id", submissionId)
+      .maybeSingle();
+    if (submissionError) throw submissionError;
+    if (!submission) return jsonResponse({ error: "submission_not_found" }, 404);
+
+    const role = normalizeRole(user.role);
+    let recipients: Array<string | number> = [];
+    let notificationType = "";
+    let title = "";
+    let message = "";
+
+    if (action === "notifySubmissionCreated") {
+      if (!["ORG", "ORGANIZATION", "ORGANISATION", "DEPARTMENT", "CREATOR"].includes(role)) {
+        return jsonResponse({ error: "organization_required" }, 403);
+      }
+      if (String(submission.user_id) !== String(user.id)) {
+        return jsonResponse({ error: "submission_access_denied" }, 403);
+      }
+
+      const { data: users, error: reviewersError } = await supabase.from("users")
+        .select("id,role,account_status,is_approved")
+        .in("role", ["PAIR", "PAIR_STAFF", "PAIR STAFF", "PAIR-STAFF", "pair", "pair_staff", "pair staff", "pair-staff"])
+        .or("is_approved.eq.true,account_status.eq.approved");
+      if (reviewersError) throw reviewersError;
+      recipients = (users || [])
+        .filter((reviewer) =>
+          ["PAIR", "PAIR_STAFF"].includes(normalizeRole(reviewer.role)) &&
+          (reviewer.is_approved === true || reviewer.account_status === "approved")
+        )
+        .map((reviewer) => reviewer.id);
+
+      const { data: organization, error: organizationError } = await supabase.from("users")
+        .select("department_id,role")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (organizationError) throw organizationError;
+      if (
+        submission.submission_target === "department" &&
+        normalizeRole(organization?.role) !== "DEPARTMENT" &&
+        organization?.department_id !== null &&
+        organization?.department_id !== undefined
+      ) {
+        const { data: departments, error: departmentsError } = await supabase.from("users")
+          .select("id,role,account_status,is_approved,department_id")
+          .eq("department_id", organization.department_id)
+          .in("role", ["department", "DEPARTMENT"])
+          .or("is_approved.eq.true,account_status.eq.approved");
+        if (departmentsError) throw departmentsError;
+        const departmentRecipients = (departments || [])
+          .filter((department) =>
+            normalizeRole(department.role) === "DEPARTMENT" &&
+            (department.is_approved === true || department.account_status === "approved")
+          )
+          .map((department) => department.id);
+        recipients = [...new Set([...recipients, ...departmentRecipients])];
+      }
+
+      notificationType = "App\\Notifications\\SubmissionQueuedForReview";
+      title = "New submission to review";
+      message = "A new submission was added to the review queue.";
+    } else {
+      const decision = String(body.decision || "");
+      const departmentReview = role === "DEPARTMENT" && ["approved", "rejected"].includes(decision);
+      if (!departmentReview && !["PAIR", "PAIR_STAFF", "ADMIN", "SUPER_ADMIN"].includes(role)) {
+        return jsonResponse({ error: "reviewer_required" }, 403);
+      }
+      const notifications: Record<string, { type: string; title: string; message: string }> = {
+        approved: {
+          type: "App\\Notifications\\SubmissionApproved",
+          title: "Submission Approved",
+          message: "Your submission was approved by PAIR!",
+        },
+        rejected: {
+          type: "App\\Notifications\\SubmissionRejected",
+          title: "Submission Rejected",
+          message: "Your submission needs revisions. Please check feedback.",
+        },
+        posted: {
+          type: "App\\Notifications\\SubmissionPosted",
+          title: "Submission Posted",
+          message: "Your submission has been posted!",
+        },
+      };
+      const notification = notifications[decision];
+      if (!notification) return jsonResponse({ error: "invalid_submission_decision" }, 400);
+      if (role === "DEPARTMENT" && ["approved", "rejected"].includes(decision)) {
+        const { data: organization, error: organizationError } = await supabase.from("users")
+          .select("id,department_id,role")
+          .eq("id", submission.user_id)
+          .maybeSingle();
+        if (organizationError) throw organizationError;
+        if (
+          !user.department_id ||
+          !organization ||
+          String(organization.department_id) !== String(user.department_id) ||
+          !["ORG", "ORGANIZATION", "ORGANISATION", "CREATOR"].includes(normalizeRole(organization.role))
+        ) {
+          return jsonResponse({ error: "submission_access_denied" }, 403);
+        }
+      }
+      if (![submission.status, submission.workflow_status].some((status) => String(status || "").toLowerCase() === decision)) {
+        return jsonResponse({ error: "submission_status_not_updated" }, 409);
+      }
+      recipients = submission.user_id === null || submission.user_id === undefined ? [] : [submission.user_id];
+      notificationType = notification.type;
+      title = notification.title;
+      message = role === "DEPARTMENT"
+        ? decision === "rejected"
+          ? "Your submission needs revisions. Please check the department feedback."
+          : "Your submission was approved by your department."
+        : notification.message;
+    }
+
+    if (recipients.length === 0) return jsonResponse({ created: 0 });
+
+    const now = new Date().toISOString();
+    const { error: insertError } = await supabase.from("notifications").insert(
+      recipients.map((recipientId) => ({
+        id: crypto.randomUUID(),
+        type: notificationType,
+        notifiable_type: "App\\Models\\User",
+        notifiable_id: recipientId,
+        data: JSON.stringify({ title, message, submission_id: submission.id }),
+        created_at: now,
+        updated_at: now,
+      })),
+    );
+    if (insertError) throw insertError;
+    return jsonResponse({ created: recipients.length });
   }
 
   if (action === "updateProfile") {

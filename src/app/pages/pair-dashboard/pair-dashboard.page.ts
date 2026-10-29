@@ -33,13 +33,16 @@ export class PairDashboardPage implements OnInit {
   // Get all submissions (for PAIR to review)
   async getSubmissions() {
     try {
-      const { data, error } = await this.supabaseService.supabase
-        .from('submissions')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const { data, error } = await this.supabaseService.getSubmissions();
 
       console.log('PAIR SUBMISSIONS DATA:', data);
       console.log('PAIR SUBMISSIONS ERROR:', error);
+
+      if (error) {
+        console.error('Could not load PAIR submissions:', error);
+        this.submissions = [];
+        return;
+      }
 
       if (data) {
         // Format dates

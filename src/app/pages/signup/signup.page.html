@@ -5,17 +5,21 @@
     <!-- LOGO -->
     <div class="logo-section">
 
-      <h1>Syncro</h1>
+      <h1 class="syncro-brand" aria-label="Syncro">
+        <ion-icon name="sync-outline" aria-hidden="true"></ion-icon>
+        <span>Syncro</span>
+      </h1>
 
-      <p>Request an account</p>
+      <p class="form-subtitle">Request an account</p>
 
-      <p>Your request will be reviewed by an administrator before you can sign in.</p>
+      <p class="form-description">Your request will be reviewed by an administrator before you can sign in.</p>
 
     </div>
 
     <div class="input-group">
-      <label>Your name</label>
+      <label for="signup-name"><ion-icon name="id-card" aria-hidden="true"></ion-icon>Your name</label>
       <ion-input
+        id="signup-name"
         [(ngModel)]="name"
         autocomplete="name"
         placeholder="Your full name"
@@ -23,8 +27,9 @@
     </div>
 
     <div class="input-group">
-      <label>Login username</label>
+      <label for="signup-username"><ion-icon name="person" aria-hidden="true"></ion-icon>Login username</label>
       <ion-input
+        id="signup-username"
         [(ngModel)]="username"
         autocomplete="username"
         placeholder="Choose a username"
@@ -32,8 +37,9 @@
     </div>
 
     <div class="input-group">
-      <label>School / Department</label>
+      <label for="signup-department"><ion-icon name="business" aria-hidden="true"></ion-icon>School / Department</label>
       <ion-select
+        id="signup-department"
         [(ngModel)]="departmentId"
         placeholder="Select your school or department"
         interface="popover"
@@ -50,9 +56,10 @@
     <!-- EMAIL -->
     <div class="input-group">
 
-      <label>Email</label>
+      <label for="signup-email"><ion-icon name="mail" aria-hidden="true"></ion-icon>Email</label>
 
       <ion-input
+        id="signup-email"
         [(ngModel)]="email"
         type="email"
         autocomplete="email"
@@ -64,9 +71,10 @@
     <!-- PASSWORD -->
     <div class="input-group">
 
-      <label>Password</label>
+      <label for="signup-password"><ion-icon name="lock-closed" aria-hidden="true"></ion-icon>Password</label>
 
       <ion-input
+        id="signup-password"
         [(ngModel)]="password"
         type="password"
         placeholder="Enter a strong password"
@@ -81,9 +89,10 @@
     <!-- CONFIRM -->
     <div class="input-group">
 
-      <label>Confirm Password</label>
+      <label for="signup-confirm-password"><ion-icon name="checkmark-circle" aria-hidden="true"></ion-icon>Confirm Password</label>
 
       <ion-input
+        id="signup-confirm-password"
         [(ngModel)]="confirmPassword"
         type="password"
         placeholder="Confirm your password"
@@ -98,8 +107,10 @@
       class="signup-btn"
       (click)="register()"
       [disabled]="isSubmitting || departments.length === 0"
+      [attr.aria-busy]="isSubmitting"
     >
 
+      <ion-icon [name]="isSubmitting ? 'hourglass-outline' : 'person-add'" slot="start" aria-hidden="true"></ion-icon>
       {{ isSubmitting ? 'Submitting request...' : 'Request account' }}
 
     </ion-button>
@@ -107,11 +118,12 @@
     <!-- LOGIN -->
     <div class="login-link">
 
-      Already registered?
+      <span class="login-prompt">Already registered?</span>
 
-      <span routerLink="/login">
-        Sign in
-      </span>
+      <a routerLink="/login">
+        <ion-icon name="log-in" aria-hidden="true"></ion-icon>
+        Sign in to your account
+      </a>
 
     </div>
 

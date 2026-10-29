@@ -85,7 +85,7 @@ export class DashboardPage implements OnInit {
       this.awaitingReview =
         this.posts.filter(
 
-          p => p.status === 'pending'
+          p => this.getStatus(p) === 'pending'
 
         ).length;
 
@@ -101,11 +101,17 @@ export class DashboardPage implements OnInit {
       this.approved =
         this.posts.filter(
 
-          p => p.status === 'approved'
+          p => this.getStatus(p) === 'approved'
 
         ).length;
 
     }
+  }
+
+  getStatus(post: any): string {
+    const workflowStatus = String(post.workflow_status || '').toLowerCase();
+    if (workflowStatus === 'rejected') return workflowStatus;
+    return String(post.status || workflowStatus).toLowerCase();
   }
 
   // REVIEW

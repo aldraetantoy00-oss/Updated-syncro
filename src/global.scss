@@ -39,3 +39,139 @@
 /* @import "@ionic/angular/css/palettes/dark.system.css"; */
 
 /* bottom tab styles moved to the page-local stylesheet */
+
+:root {
+  --syncro-font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --syncro-control-radius: 10px;
+}
+
+.syncro-brand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  color: inherit;
+  font: inherit;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.syncro-brand ion-icon {
+  flex: 0 0 auto;
+  color: inherit;
+  font-size: 1.15em;
+}
+
+ion-content:not(.organization-dashboard) {
+  --background: #f5f7fb;
+  --ion-font-family: var(--syncro-font-family);
+  font-family: var(--syncro-font-family);
+}
+
+ion-content:not(.organization-dashboard) ion-button {
+  --border-radius: var(--syncro-control-radius);
+  font-family: var(--syncro-font-family);
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+ion-content:not(.organization-dashboard) ion-button[color="success"],
+ion-content:not(.organization-dashboard) ion-button[color="primary"] {
+  --background: var(--syncro-green);
+  --background-hover: var(--syncro-green-dark);
+  --background-activated: var(--syncro-green-dark);
+  --color: #ffffff;
+}
+
+ion-content:not(.organization-dashboard) .app-page-header.app-page-header,
+ion-header.app-page-header {
+  box-sizing: border-box;
+  min-height: 72px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, var(--syncro-green-dark), var(--syncro-green));
+  color: #ffffff;
+  box-shadow: 0 8px 22px rgba(21, 128, 61, 0.16);
+}
+
+ion-content .app-topbar,
+ion-content.organization-dashboard .top {
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+ion-content .app-topbar > .syncro-brand,
+ion-content.organization-dashboard .top > .syncro-brand {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  justify-content: center;
+  pointer-events: none;
+}
+
+ion-content:not(.organization-dashboard) .app-topbar > span {
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+ion-content:not(.organization-dashboard) .app-topbar > ion-icon {
+  color: #ffffff;
+  font-size: 22px;
+}
+
+ion-content:not(.organization-dashboard) .app-topbar ion-menu-button,
+ion-content:not(.organization-dashboard) .app-topbar ion-button {
+  --color: #ffffff;
+  color: #ffffff;
+  margin: 0;
+}
+
+ion-content:not(.organization-dashboard) .app-page-title {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(1.15rem, 4vw, 1.5rem);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+ion-content:not(.organization-dashboard) .app-page-heading h1,
+ion-content:not(.organization-dashboard) .app-section-title {
+  margin: 0;
+  color: #111827;
+  font-size: clamp(1.35rem, 4vw, 1.75rem);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+ion-content:not(.organization-dashboard) .app-page-heading p {
+  margin: 6px 0 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+ion-header.app-page-header ion-toolbar {
+  --background: transparent;
+  --color: #ffffff;
+  --min-height: 48px;
+}
+
+ion-header.app-page-header ion-title,
+ion-header.app-page-header ion-button {
+  color: #ffffff;
+  font-family: var(--syncro-font-family);
+  font-weight: 700;
+}
+
+ion-content:not(.organization-dashboard) ion-tab-button {
+  font-family: var(--syncro-font-family);
+  font-size: 0.75rem;
+  font-weight: 600;
+}

@@ -31,6 +31,18 @@
   overflow-wrap: anywhere;
 }
 
+.request-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.account-type {
+  min-width: 190px;
+  --background: var(--ion-color-light);
+  --border-radius: 8px;
+}
+
 .state {
   display: flex;
   align-items: center;
@@ -46,9 +58,16 @@
 @media (max-width: 480px) {
   .request {
     align-items: flex-start;
+    flex-direction: column;
   }
 
-  .request ion-button {
-    flex-shrink: 0;
+  .request-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .account-type {
+    min-width: 0;
+    flex: 1;
   }
 }

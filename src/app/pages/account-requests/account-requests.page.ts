@@ -11,7 +11,8 @@ interface AccountRequest {
   department_id: number | null;
   created_at: string | null;
   departmentName?: string;
-  approving?: boolean;
+  accountType?: 'org' | 'department';
+  approving: boolean;
 }
 
 @Component({
@@ -55,14 +56,19 @@ export class AccountRequestsPage implements OnInit {
       ...request,
       name: request.profile_name || request.name,
       username: request.username || request.name,
-      departmentName: departmentNames.get(request.department_id) || 'Department not found'
+      departmentName: departmentNames.get(request.department_id) || 'Department not found',
+      accountType: 'org',
+      approving: false
     }));
     this.loading = false;
   }
 
   async approve(request: AccountRequest) {
     request.approving = true;
-    const { data, error } = await this.supabaseService.approveAccountRequest(request.id);
+    const { data, error } = await this.supabaseService.approveAccountRequest(
+      request.id,
+      request.accountType || 'org'
+    );
     request.approving = false;
 
     const toast = await this.toastCtrl.create({

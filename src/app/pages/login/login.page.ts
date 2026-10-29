@@ -15,6 +15,7 @@ export class LoginPage implements OnInit {
 
   email = '';
   password = '';
+  showPassword = false;
   isLoggingIn = false;
   accountRequestSubmitted = false;
 
@@ -30,6 +31,10 @@ export class LoginPage implements OnInit {
       this.accountRequestSubmitted = localStorage.getItem('accountRequestSubmitted') === 'true';
       localStorage.removeItem('accountRequestSubmitted');
     } catch (e) {}
+  }
+
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
   }
 
   // LOGIN
