@@ -33,6 +33,10 @@ export class SubmitPage {
   isDepartmentUser = false;
   departmentLoadError = '';
   content = '';
+  draftPrompt = '';
+  aiLanguage = 'Olang (local)';
+  aiTone = 'Formal tone';
+  desiredPostAt = '';
 
   links: string[] = [''];
 
@@ -75,6 +79,21 @@ export class SubmitPage {
 
   addLink() {
     this.links.push('');
+  }
+
+  generateDraft() {
+    if (!this.draftPrompt.trim()) {
+      alert('Please describe the content first.');
+      return;
+    }
+
+    const typeLabel = this.contentType === 'social_media'
+      ? 'Social media update'
+      : 'University article';
+    const toneText = this.aiTone === 'Casual tone'
+      ? 'Our community'
+      : 'The university community';
+    this.content = `${typeLabel}: ${this.draftPrompt.trim()}\n\n${toneText} is invited to take note of this update. Please refer to the confirmed details shared above.`;
   }
 
   removeLink(i: number) {
@@ -127,6 +146,10 @@ export class SubmitPage {
 
   cancel() {
     this.content = '';
+    this.draftPrompt = '';
+    this.desiredPostAt = '';
+    this.aiLanguage = 'Olang (local)';
+    this.aiTone = 'Formal tone';
     this.links = [''];
     this.attachments = [];
     this.navCtrl.navigateBack('/tabs/dashboard');
@@ -174,6 +197,9 @@ export class SubmitPage {
         media_names: this.attachments.map(({ file }) => file.name),
         content_type: this.contentType,
         submission_target: this.submissionTarget,
+        desired_post_at: this.desiredPostAt || null,
+        ai_language: this.aiLanguage,
+        ai_tone: this.aiTone,
         status: 'pending',
         workflow_status: 'submitted'
       };
@@ -225,10 +251,14 @@ export class SubmitPage {
 
       // RESET
       this.content = '';
+      this.draftPrompt = '';
 
       this.links = [''];
 
       this.attachments = [];
+      this.desiredPostAt = '';
+      this.aiLanguage = 'Olang (local)';
+      this.aiTone = 'Formal tone';
       this.contentType = 'social_media';
       this.submissionTarget = this.isDepartmentUser ? 'pair' : 'department';
 

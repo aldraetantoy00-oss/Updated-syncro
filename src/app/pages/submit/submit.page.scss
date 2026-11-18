@@ -1,84 +1,64 @@
-.header {
-  box-sizing: border-box;
-  min-height: 72px;
-  background: linear-gradient(135deg, #166534, #15803d);
-  padding: 12px 20px;
-  color: white;
-}
-
-.top-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: bold;
-  min-height: 44px;
+:host,
+.submit-content {
+  --background: #f8faf9;
 }
 
 .container {
   width: min(100%, 1040px);
   margin: 0 auto;
-  padding: 18px 16px 30px;
-}
-
-h2 {
-  margin: 4px 0;
-  color: #1d2b22;
-  font-weight: 700;
-}
-
-.subtitle {
-  margin: 0 0 18px;
-  color: #526158;
-  font-size: 13px;
+  padding: 14px 16px 24px;
+  color: #26352c;
+  background: #f8faf9;
 }
 
 .form-section {
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
-.form-section h3 {
-  margin: 0 0 10px;
+.form-section h3,
+.card > label {
+  margin: 0 0 7px;
   color: #24352a;
-  font-size: 14px;
-  font-weight: 750;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .choice-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 10px;
 }
 
 .choice-card {
   display: grid;
-  gap: 8px;
-  min-height: 76px;
-  padding: 12px;
-  border: 1px solid #d5ddd7;
-  border-radius: 8px;
+  gap: 5px;
+  min-height: 54px;
+  padding: 8px 10px;
+  border: 1px solid #dfe5e1;
+  border-radius: 6px;
   background: #fff;
   color: #25352b;
   text-align: left;
   cursor: pointer;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
 .choice-card strong {
   display: flex;
   align-items: center;
-  gap: 7px;
-  font-size: 14px;
+  gap: 6px;
+  font-size: 12px;
 }
 
 .choice-card strong ion-icon,
 .card > label ion-icon {
   color: var(--syncro-green, #15803d);
+  font-size: 15px;
 }
 
 .choice-card span {
-  color: #66736b;
-  font-size: 12px;
-  line-height: 1.4;
+  color: #69766f;
+  font-size: 10px;
+  line-height: 1.35;
 }
 
 .choice-card.selected {
@@ -90,74 +70,175 @@ h2 {
 .radio-option {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 8px 0;
+  gap: 7px;
+  margin: 5px 0;
   color: #36443b;
-  font-size: 14px;
+  font-size: 12px;
   cursor: pointer;
 }
 
 .radio-option input {
+  width: 12px;
+  height: 12px;
+  margin: 0;
   accent-color: var(--syncro-green, #15803d);
 }
 
+.target-name {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.target-name ion-icon {
+  color: var(--syncro-green, #15803d);
+  font-size: 13px;
+}
+
+.target-name small {
+  color: #5d6a62;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.pair-option {
+  margin-bottom: 4px;
+}
+
 .card {
-  background: #ffffff;
+  background: #fff;
   border: 1px solid #e4e9e5;
-  border-radius: 10px;
-  padding: 14px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
-
-label {
-  font-weight: 600;
-  display: block;
-  margin-bottom: 8px;
-  color: #27382d;
-}
-
-.card ion-textarea,
-.link-row ion-input {
-  --background: #fff;
-  --border-color: #d7ded9;
-  --border-radius: 6px;
-  --padding-start: 10px;
-  --padding-end: 10px;
-  border: 1px solid #d7ded9;
   border-radius: 6px;
+  padding: 10px 11px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 3px rgba(24, 39, 30, 0.05);
 }
 
-.card ion-textarea {
-  min-height: 92px;
+.card > label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 6px;
 }
 
-.card .hint {
-  margin: 7px 0 0;
-  color: #647168;
-  font-size: 12px;
+.draft-input,
+.native-datetime {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #d9e0dc;
+  border-radius: 5px;
+  background: #fff;
+  color: #26352c;
+  font: 11px/1.45 Arial, sans-serif;
+  outline: none;
+}
+
+.draft-input {
+  min-height: 58px;
+  resize: vertical;
+  padding: 8px;
+}
+
+.draft-input::placeholder {
+  color: #8a9790;
+}
+
+.draft-input:focus,
+.native-datetime:focus {
+  border-color: var(--syncro-green, #15803d);
+  box-shadow: 0 0 0 1px rgba(21, 128, 61, 0.12);
+}
+
+.hint,
+.character-count,
+.field-error {
+  margin: 5px 0 0;
+  color: #69766f;
+  font-size: 9px;
+  line-height: 1.35;
+}
+
+.hint ion-icon {
+  margin-right: 3px;
+  color: #5d6a62;
+  vertical-align: middle;
+  font-size: 11px;
+}
+
+.character-count {
+  text-align: right;
+  color: #7b8780;
+}
+
+.draft-tools {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 7px;
+}
+
+.draft-select {
+  width: 112px;
+  min-height: 28px;
+  border: 1px solid #d9e0dc;
+  border-radius: 5px;
+  background: #fff;
+  --padding-start: 8px;
+  --padding-end: 8px;
+  font-size: 10px;
+}
+
+.generate-btn {
+  height: 28px;
+  margin: 0;
+  --border-color: #86a997;
+  --color: #247d4d;
+  --border-radius: 5px;
+  font-size: 10px;
+  text-transform: none;
+}
+
+.native-datetime {
+  height: 34px;
+  padding: 6px 8px;
+  font-size: 11px;
 }
 
 .link-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 7px;
+  margin-bottom: 6px;
 }
 
-.hint {
-  font-size: 12px;
-  color: #6b7280;
-  margin-top: 8px;
+.link-row ion-input {
+  --background: #fff;
+  --border-color: #d9e0dc;
+  --border-radius: 5px;
+  --padding-start: 8px;
+  --padding-end: 8px;
+  min-height: 34px;
+  border: 1px solid #d9e0dc;
+  border-radius: 5px;
+  font-size: 11px;
+}
+
+.card > ion-button {
+  height: 28px;
+  margin: 0;
+  --border-radius: 5px;
+  font-size: 10px;
+  text-transform: none;
 }
 
 .upload-box {
-  border: 1px dashed #d1d5db;
-  border-radius: 8px;
-  padding: 20px 14px;
+  border: 1px dashed #d1d7d3;
+  border-radius: 6px;
+  padding: 10px;
   text-align: center;
   position: relative;
-  background: #f9fafb;
+  background: #fbfcfb;
+  min-height: 82px;
 }
 
 .upload-box input {
@@ -167,54 +248,56 @@ label {
   height: 100%;
   opacity: 0;
   cursor: pointer;
+  z-index: 2;
 }
 
 .upload-box ion-icon {
-  font-size: 30px;
-  color: #9ca3af;
+  display: block;
+  margin: 0 auto 4px;
+  font-size: 24px;
+  color: #15803d;
 }
 
 .upload-box p {
-  margin: 8px 0;
-  font-weight: 500;
+  margin: 4px 0;
+  font-size: 11px;
+  font-weight: 600;
 }
 
 .upload-box small {
   display: block;
-  color: #6b7280;
-  font-size: 11px;
+  color: #7a8780;
+  font-size: 9px;
 }
 
 .attachment-list {
   display: grid;
-  gap: 8px;
-  margin-top: 12px;
+  gap: 6px;
+  margin-top: 8px;
 }
 
 .attachment {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
-  padding: 7px;
+  padding: 5px;
   border: 1px solid #e5e9e6;
-  border-radius: 8px;
-  color: #36443b;
-  font-size: 12px;
+  border-radius: 6px;
+  font-size: 10px;
 }
 
 .attachment img,
 .attachment > ion-icon {
-  width: 40px;
-  height: 40px;
-  flex: 0 0 40px;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
   color: var(--syncro-green, #15803d);
-  font-size: 22px;
 }
 
 .attachment img {
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 5px;
 }
 
 .attachment span {
@@ -225,35 +308,73 @@ label {
 }
 
 .field-error {
-  margin: 8px 0 0;
   color: var(--ion-color-danger);
-  font-size: 12px;
 }
 
 .form-actions {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 10px;
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr) 76px;
+  gap: 8px;
+  margin-top: 2px;
 }
 
 .submit-btn {
-  min-height: 44px;
+  height: 34px;
   margin: 0;
   --background: #14532d;
   --background-hover: #166534;
-  --border-radius: 8px;
+  --border-radius: 5px;
+  font-size: 11px;
   font-weight: 700;
+  text-transform: none;
 }
 
 .form-actions ion-button[fill="outline"] {
-  min-width: 84px;
-  --border-radius: 8px;
+  height: 34px;
+  margin: 0;
+  --border-radius: 5px;
+  font-size: 11px;
+  text-transform: none;
+}
+
+.pro-tip {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 10px;
+  padding: 7px 9px;
+  border-radius: 5px;
+  background: #edf8ee;
+  color: #2f5a3b;
+  font-size: 9px;
+  line-height: 1.35;
+}
+
+.pro-tip ion-icon {
+  flex: 0 0 auto;
+  color: #15803d;
+  font-size: 13px;
 }
 
 @media (max-width: 620px) {
+  .container {
+    padding: 10px;
+  }
+
   .choice-grid {
     grid-template-columns: 1fr;
+  }
+
+  .draft-tools {
+    flex-wrap: wrap;
+  }
+
+  .draft-select {
+    flex: 1 1 100px;
+  }
+
+  .generate-btn {
+    flex: 1 1 auto;
   }
 
   .form-actions {

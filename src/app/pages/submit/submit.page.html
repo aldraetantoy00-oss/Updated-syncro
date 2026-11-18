@@ -1,6 +1,4 @@
 <ion-content class="submit-content">
-
-  <!-- HEADER -->
   <div class="header app-page-header">
     <div class="top-bar app-topbar">
       <ion-menu-button aria-label="Open menu">
@@ -17,13 +15,6 @@
   </div>
 
   <div class="container">
-
-    <!-- TITLE -->
-    <h2>Submit Content</h2>
-    <p class="subtitle">
-      Share your content with your Department or PAIR for review
-    </p>
-
     <section class="form-section">
       <h3>What are you submitting?</h3>
       <div class="choice-grid">
@@ -46,7 +37,6 @@
           <span>A detailed article draft for the official university website.</span>
         </button>
       </div>
-      <p class="hint">This submits content for review only. Publishing integrations are not enabled.</p>
     </section>
 
     <section class="form-section destination-section">
@@ -59,14 +49,22 @@
           [(ngModel)]="submissionTarget"
           [disabled]="departmentId === null"
         />
-        <span>{{ departmentName }} — Department review</span>
+        <span class="target-name">
+          <ion-icon name="school-outline" aria-hidden="true"></ion-icon>
+          {{ departmentName }}
+          <small>— Department review</small>
+        </span>
       </label>
-      <label class="radio-option">
+      <label class="radio-option pair-option">
         <input type="radio" name="submissionTarget" value="pair" [(ngModel)]="submissionTarget" />
-        <span>PAIR — school-wide publication</span>
+        <span class="target-name">
+          <ion-icon name="information-circle" aria-hidden="true"></ion-icon>
+          PAIR
+          <small>— school-wide publication</small>
+        </span>
       </label>
       <p class="hint" *ngIf="!isDepartmentUser">
-        Your Department is {{ departmentName }}. Choose Department review or send directly to PAIR for school-wide review.
+        PAIR can review and approve submissions. Departments may review submissions first when enabled.
       </p>
       <p class="hint" *ngIf="isDepartmentUser">
         Department submissions are sent to PAIR for school-wide review.
@@ -77,45 +75,92 @@
     <div class="card">
       <label>
         <ion-icon name="document-text-outline"></ion-icon>
+        Use AI to draft, or write it yourself
+      </label>
+      <textarea
+        class="draft-input"
+        [(ngModel)]="draftPrompt"
+        [placeholder]="contentType === 'social_media'
+          ? 'Describe what happened and include the confirmed date, location, people involved, key details, and any important context.'
+          : 'Describe the article topic and include the confirmed date, location, people involved, key details, and important context.'"
+        [maxlength]="maxCaptionLength"
+        rows="4"
+      ></textarea>
+      <p class="hint">Tip: more accurate detail you provide, the more useful the draft. The AI must not invent missing facts.</p>
+      <div class="draft-tools">
+        <ion-select class="draft-select" [(ngModel)]="aiLanguage" interface="popover" aria-label="Language">
+          <ion-select-option value="Olang (local)">Olang (local)</ion-select-option>
+          <ion-select-option value="English">English</ion-select-option>
+          <ion-select-option value="Filipino">Filipino</ion-select-option>
+        </ion-select>
+        <ion-select class="draft-select" [(ngModel)]="aiTone" interface="popover" aria-label="Tone">
+          <ion-select-option value="Formal tone">Formal tone</ion-select-option>
+          <ion-select-option value="Casual tone">Casual tone</ion-select-option>
+          <ion-select-option value="Informative tone">Informative tone</ion-select-option>
+        </ion-select>
+        <ion-button class="generate-btn" fill="outline" size="small" (click)="generateDraft()">
+          <ion-icon name="sparkles-outline" slot="start"></ion-icon>
+          Generate draft
+        </ion-button>
+      </div>
+    </div>
+
+    <div class="card content-card">
+      <label>
+        <ion-icon name="share-social-outline" *ngIf="contentType === 'social_media'"></ion-icon>
+        <ion-icon name="newspaper-outline" *ngIf="contentType === 'website_article'"></ion-icon>
         {{ contentType === 'social_media' ? 'Social media post' : 'USJR website article' }}
       </label>
-      <ion-textarea
+      <textarea
+        class="draft-input"
         [(ngModel)]="content"
         [placeholder]="contentType === 'social_media'
           ? 'Write a concise, informational post. Include confirmed dates, locations, and key details.'
           : 'Write a detailed article draft for the official university website.'"
         [maxlength]="maxCaptionLength"
-        [counter]="true"
-        auto-grow="true">
-      </ion-textarea>
-      <p class="hint">Keep it concise. Maximum {{ maxCaptionLength | number }} characters.</p>
+        rows="4"
+      ></textarea>
+      <p class="hint">
+        <ion-icon name="information-circle-outline"></ion-icon>
+        The generated text is only a draft. Review and edit it before submitting.
+      </p>
+      <p class="character-count" *ngIf="content.length">{{ content.length | number }} / {{ maxCaptionLength | number }} characters</p>
     </div>
 
-    <!-- LINKS -->
+    <div class="card schedule-card">
+      <label>
+        <ion-icon name="calendar-outline"></ion-icon>
+        Desired Posting Date &amp; Time (Optional)
+      </label>
+      <input
+        class="native-datetime"
+        type="datetime-local"
+        [(ngModel)]="desiredPostAt"
+        aria-label="Desired posting date and time"
+      />
+      <p class="hint">
+        <ion-icon name="information-circle-outline"></ion-icon>
+        When would you like this post to be published once approved? Leave blank to publish immediately.
+      </p>
+    </div>
+
     <div class="card">
       <label><ion-icon name="link-outline"></ion-icon> Related Links (Optional)</label>
-
       <div *ngFor="let link of links; let i = index" class="link-row">
         <ion-input [(ngModel)]="links[i]" placeholder="https://example.com"></ion-input>
-
-        <ion-button fill="clear" color="danger" (click)="removeLink(i)" *ngIf="links.length > 1">
-          ✕
+        <ion-button fill="clear" color="danger" (click)="removeLink(i)" *ngIf="links.length > 1" aria-label="Remove link">
+          <ion-icon slot="icon-only" name="close-outline"></ion-icon>
         </ion-button>
       </div>
-
-      <ion-button size="small" fill="outline" color="success" (click)="addLink()">
-        + Add Another Link
-      </ion-button>
-
+      <ion-button size="small" fill="outline" color="success" (click)="addLink()">+ Add Another Link</ion-button>
       <p class="hint">
+        <ion-icon name="information-circle-outline"></ion-icon>
         Add links to related articles, events, or resources
       </p>
     </div>
 
-    <!-- FILE UPLOAD -->
     <div class="card">
-      <label><ion-icon name="attach-outline"></ion-icon> Attach files (optional)</label>
-
+      <label><ion-icon name="images-outline"></ion-icon> Upload Pictures &amp; Videos (Optional)</label>
       <div class="upload-box">
         <input
           type="file"
@@ -123,12 +168,10 @@
           accept=".jpg,.jpeg,.png,.webp,.gif,.doc,.docx,.pdf,.txt"
           (change)="onFileSelected($event)"
         />
-
         <ion-icon name="cloud-upload-outline"></ion-icon>
-        <p>Drag and drop files here or click to browse</p>
-        <small>JPG, PNG, WebP, GIF, DOC/DOCX, PDF, TXT — max 5 MB each</small>
+        <p>Drag and drop pictures or videos here, or click to browse</p>
+        <small>Add up to 10 files; JPG, PNG, WebP, GIF, DOC/DOCX, PDF, TXT. Max 5 MB each.</small>
       </div>
-
       <p class="field-error" *ngIf="fileError" role="alert">{{ fileError }}</p>
       <div class="attachment-list" *ngIf="attachments.length">
         <div class="attachment" *ngFor="let attachment of attachments; let i = index">
@@ -152,6 +195,9 @@
       </ion-button>
     </div>
 
+    <div class="pro-tip">
+      <ion-icon name="bulb-outline"></ion-icon>
+      <span><strong>Pro Tip:</strong> Include key details like dates, event names, and main points to help reviewers prepare your publication.</span>
+    </div>
   </div>
-
 </ion-content>
